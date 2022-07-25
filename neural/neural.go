@@ -1,0 +1,5 @@
+package neural
+
+func InitNeuralNetwork() {
+
+}
