@@ -1,4 +1,5 @@
 custom/
 screenshots/
-utils/.env
+utils/
+pilot/extensions/
 .env

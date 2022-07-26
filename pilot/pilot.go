@@ -31,7 +31,7 @@ func InitPilot() {
 func UserMachineReport(page *rod.Page) {
 	screenshots := "screenshots/"
 
-	el := page.MustElement("#broken-image-dimensions.passed")
+	el := page.MustElement("#report-image-dimensions.passed")
 	for _, row := range el.MustParents("table").First().MustElements("tr:nth-child(n+2)") {
 		cells := row.MustElements("td")
 		key := cells[0].MustProperty("textContent")

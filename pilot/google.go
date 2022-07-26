@@ -3,14 +3,47 @@ package pilot
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 	"time"
 
 	"wiremelt/twocaptcha"
 
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 )
 
+func LoadExtension() {
+	screenshots := "screenshots/"
+
+	extPath, _ := filepath.Abs("pilot/extensions/buster")
+
+	u := launcher.New().
+		// Must use abs path for an extension
+		Set("load-extension", extPath).
+		// Headless mode doesn't support extension yet.
+		// Reason: https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c5
+		// You can use XVFB to get rid of it: https://github.com/go-rod/rod/blob/master/lib/examples/launch-managed/main.go
+		Headless(false).
+		MustLaunch()
+
+	page := rod.New().ControlURL(u).MustConnect().MustPage("https://www.google.com/recaptcha/api2/demo")
+
+	time.Sleep(3 * time.Second)
+	page.MustElement("#recaptcha-anchor > div.recaptcha-checkbox-border").MustClick()
+
+	time.Sleep(3 * time.Second)
+	page.MustWaitLoad().MustScreenshot(fmt.Sprintf("%sExtension.png", screenshots))
+	fmt.Println("OK")
+
+	time.Sleep(1 * time.Hour)
+
+	// Skip
+	// Output: ok
+}
+
 func InitGoogleDemo() {
+	LoadExtension()
+
 	screenshots := "screenshots/"
 
 	twoCaptchaAPIKey := "06b1f801f4b0bcc0d1abea45e7306543"

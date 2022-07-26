@@ -63,6 +63,7 @@ func TestIsStringValidURL(t *testing.T) {
 		}
 	}
 }
+
 func TestCapitalizeString(t *testing.T) {
 	input := "macro"
 	inputCaps := CapitalizeString(input)

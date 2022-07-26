@@ -1,14 +1,14 @@
 package main
 
 import (
-	"encoding/base64"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
 
+	"wiremelt/macro"
 	"wiremelt/pilot"
 	"wiremelt/shell"
 	"wiremelt/utils"
@@ -72,6 +72,15 @@ func main() {
 			},
 		},
 		Action: func(context *cli.Context) error {
+			// Strings
+			validateString := func(input string) error {
+				isString := utils.CheckStringForEmptiness(input)
+				if !isString {
+					return errors.New("invalid Input")
+				}
+				return nil
+			}
+
 			fmt.Println("\n\tWIREMELT")
 
 			if context.Args().Len() > 0 {
@@ -120,7 +129,7 @@ func main() {
 					importName := context.Args().Get(1)
 					importURL := context.Args().Get(2)
 
-					if !utils.CheckStringForEmptiness(importName) || !utils.CheckStringForEmptiness(importURL) {
+					if !utils.CheckStringForEmptiness(importName) {
 						loadSess := wiremelt.LoadSessionConfiguration()
 						fmt.Println("~ MACRO LIBRARY:", loadSess.MacroLibrary)
 					} else {
@@ -165,27 +174,73 @@ func main() {
 										existingSession := wiremelt.LoadSessionConfiguration()
 										maps.Copy(existingSession.MacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                        // Copy local macroSpecs into saved sessionConf
 										newConf := wiremelt.NewSessionConfig(existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerFactory, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle) // Initialize SessionConfiguration with input values
-										conf, err := json.Marshal(newConf)                                                                                                                                                                                                                                                                                // Convert SessionConfiguration to JSON object
-										if err != nil {
-											log.Println(err)
-										}
-
-										fmt.Println("\n+ MACRO LIBRARY:", newConf.MacroLibrary)
-
-										strConf := string(conf)                                          // Convert SessionConfiguration JSON object to string
-										baseConf64 := base64.StdEncoding.EncodeToString([]byte(strConf)) // Encode `strConf` to base64
-										envKeyValue := fmt.Sprintf("SESSION_CONFIG=%s\n", baseConf64)    // Convert base64 to string for .env file
-
-										utils.WriteToEnv("SESSION_CONFIG", envKeyValue)
-										fmt.Println("\n\t[✓] SessionConf saved!")
+										newConf.UpdateSessionConfiguration()
 									} else {
 										fmt.Println("\n+ TEMP MACRO LIBRARY:", worker.MacroSpecs)
 									}
 								}
 							}
 						} else {
-							log.Fatalln("[x] macro import must be a valid JavaScript URL route")
+							existingSession := wiremelt.LoadSessionConfiguration()
+							existingMacroLibrary := existingSession.MacroLibrary
+
+							addNewMacro := func() {
+								if !utils.CheckStringForEmptiness(importURL) {
+									importName = fmt.Sprintf("%s*", importName)
+									importURL = ""
+								}
+
+								fmt.Println("\t> ADD DEFAULT MACRO:", importName)
+
+								worker.MacroSpecs[importName] = importURL
+
+								if wiremelt.DoesEnvFileExist() {
+									maps.Copy(existingMacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                                // Copy local macroSpecs into saved sessionConf
+									newConf := wiremelt.NewSessionConfig(existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerFactory, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle) // Initialize SessionConfiguration with input values
+									newConf.UpdateSessionConfiguration()
+								} else {
+									fmt.Println("\n+ TEMP MACRO LIBRARY:", worker.MacroSpecs)
+								}
+							}
+
+							if _, ok := macro.MacroLibrary[importName]; ok { // Default Macro
+								addNewMacro()
+							} else if strings.Contains(importURL, ".js") { // Custom Macro
+								addNewMacro()
+							} else {
+								log.Fatalln("[x] macro import must reference a default macro or (.js) JavaScript file.")
+							}
 						}
+					}
+				case "del":
+					if wiremelt.DoesEnvFileExist() {
+						sessConf := wiremelt.LoadSessionConfiguration()
+						macroSpec := sessConf.MacroLibrary
+
+						fmt.Println("\n~ SESSION MACROS:", macroSpec)
+						fmt.Println()
+
+						promptTargetMacro := promptui.Prompt{
+							Label:    "Delete Macro",
+							Validate: validateString,
+						}
+						resultTargetMacro, err := promptTargetMacro.Run()
+						if err != nil {
+							fmt.Printf("resultTargetMacro Error: %v\n", err)
+						}
+
+						parseTarget := strings.TrimSpace(utils.CapitalizeString(resultTargetMacro))
+
+						if _, ok := macroSpec[parseTarget]; ok {
+							delete(macroSpec, parseTarget)
+
+							newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerFactory, sessConf.FactoryFocus, sessConf.WorkerRoles, macroSpec, sessConf.ShellCycle) // Initialize SessionConfiguration with input values
+							newConf.UpdateSessionConfiguration()
+
+							fmt.Println("\n- MACRO LIBRARY:", macroSpec)
+						}
+					} else {
+						log.Fatalln("[x] macro del requires a session configuration with specified macros.")
 					}
 				case "shell":
 					macroSpec := wiremelt.LoadSessionConfiguration().MacroLibrary

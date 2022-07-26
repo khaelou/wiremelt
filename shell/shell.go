@@ -21,7 +21,7 @@ func InitShell(spec worker.MacroSpec) {
 			log.Println(err)
 		}
 
-		wireMeltShell := fmt.Sprintf("\n>_ ] wiremelt@%s\n", hostName)
+		wireMeltShell := fmt.Sprintf(">_ ] wiremelt@%s\n", hostName)
 		fmt.Println(wireMeltShell)
 
 		// Read the keyboad input.
@@ -71,7 +71,7 @@ func execSysInput(input string) error {
 	// Split the input to separate the command and the arguments.
 	args := strings.Split(input, " ")
 
-	// Check for built-in commands.
+	// Check for default commands.
 	switch args[0] {
 	case "cd":
 		// 'cd' to home dir with empty path not yet supported.

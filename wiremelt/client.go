@@ -62,6 +62,7 @@ func constructFactories(ctx context.Context, cancel context.CancelFunc, factorie
 			}
 
 			fmt.Println("DONE.")
+			fmt.Println()
 		}
 	}()
 }

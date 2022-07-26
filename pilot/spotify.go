@@ -39,9 +39,9 @@ func SpotifySignin() {
 	defer browser.MustClose()
 
 	page := stealth.MustPage(browser).MustWindowFullscreen()
-	//page.SetUserAgent(&proto.NetworkSetUserAgentOverride{UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.3"})
-	//page.MustNavigate("https://bot.sannysoft.com")
-	//UserMachineReport(page)
+	page.SetUserAgent(&proto.NetworkSetUserAgentOverride{UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.3"})
+	page.MustNavigate("https://bot.sannysoft.com")
+	UserMachineReport(page)
 
 	page.MustNavigate(loginURL)
 	fmt.Printf("stealth.JS: %x\n", md5.Sum([]byte(stealth.JS))) // You can also use stealth.JS directly without rod

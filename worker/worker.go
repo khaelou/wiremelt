@@ -18,7 +18,7 @@ type MacroMapping map[string]interface{}
 
 var MacroFileDir = "custom/"      // Directory to store external macros (JavaScript)
 var MacroSpecs = MacroSpec{}      // Map to track macros from SessionConfig
-var MacroLibrary = MacroMapping{} // Map for built-in macros
+var MacroLibrary = MacroMapping{} // Map for default macros
 
 var ProductChannel = make(chan macro.ProductSignal, math.MaxInt8)
 
@@ -60,11 +60,11 @@ func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
 			case job := <-w.JobChannel: // Worker has received job
 				job.Macro = strings.Replace(job.Macro, "*", "", -1) // Remove '*' signifing ignore of ParamArg
 
-				// Check if Built-in Macro or Custom Macro
+				// Check if Default Macro or Custom Macro
 				if !strings.Contains(job.ParamArg, ".js") { // Built-in Macro
 					executeMacro, err := macro.CallEmbedded(job.Macro, job.ParamArg)
 					if err != nil {
-						log.Fatalln(err)
+						log.Fatalln("macroIdentity error:", err)
 					}
 
 					var execMacro interface{} = executeMacro
@@ -78,7 +78,7 @@ func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
 						// Parse file
 						fileContent, err := ioutil.ReadFile(jsScript)
 						if err != nil {
-							log.Fatalln(err)
+							log.Fatalln("customMacro error:", err)
 						}
 						convScript := string(fileContent) // Convert []byte to string
 

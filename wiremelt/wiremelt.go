@@ -237,17 +237,7 @@ func PromptClientConfInit() *ClientConfiguration {
 	proxyConn := helpers.ProxyConnection{Host: resultProxyHost, Port: resultProxyPort}                                                       // Initialize proxy connection
 
 	newConf := *newClientConfig(dbConn, reCapConn, proxyConn) // Initialize ClientConfiguration with input values
-	conf, err := json.Marshal(newConf)                        // Convert ClientConfiguration to JSON object
-	if err != nil {
-		log.Println(err)
-	}
-
-	strConf := string(conf)                                          // Convert ClientConfiguration JSON object to string
-	baseConf64 := base64.StdEncoding.EncodeToString([]byte(strConf)) // Encode `strConf` to base64
-	envKeyValue := fmt.Sprintf("CLIENT_CONFIG=%s\n", baseConf64)     // Convert base64 to string for .env file
-
-	utils.WriteToEnv("CLIENT_CONFIG", envKeyValue)
-	fmt.Println("\n\t[✓] ClientConf saved!")
+	newConf.UpdateClientConfiguration()
 
 	return &newConf
 }
@@ -520,6 +510,20 @@ func LoadClientConfiguration() *ClientConfiguration {
 	return loadConf
 }
 
+func (newConfig *ClientConfiguration) UpdateClientConfiguration() {
+	conf, err := json.Marshal(newConfig) // Convert ClientConfiguration to JSON object
+	if err != nil {
+		log.Println(err)
+	}
+
+	strConf := string(conf)                                          // Convert ClientConfiguration JSON object to string
+	baseConf64 := base64.StdEncoding.EncodeToString([]byte(strConf)) // Encode `strConf` to base64
+	envKeyValue := fmt.Sprintf("CLIENT_CONFIG=%s\n", baseConf64)     // Convert base64 to string for .env file
+
+	utils.WriteToEnv("CLIENT_CONFIG", envKeyValue)
+	fmt.Println("\n\t[✓] ClientConf saved!")
+}
+
 // Obtain SessionConf from ENV file for usage
 func LoadSessionConfiguration() *SessionConfiguration {
 	err := godotenv.Load(".env")
@@ -538,5 +542,23 @@ func LoadSessionConfiguration() *SessionConfiguration {
 	json.Unmarshal(rawConf64, &loadConf) // Convert SessionConfiguration to JSON object
 	//fmt.Println("SessionConf:", loadConf)
 
+	worker.MacroSpecs = loadConf.MacroLibrary
+
 	return loadConf
+}
+
+func (newConfig *SessionConfiguration) UpdateSessionConfiguration() {
+	conf, err := json.Marshal(newConfig) // Convert SessionConfiguration to JSON object
+	if err != nil {
+		log.Println(err)
+	}
+
+	fmt.Println("\n+ MACRO LIBRARY:", newConfig.MacroLibrary)
+
+	strConf := string(conf)                                          // Convert SessionConfiguration JSON object to string
+	baseConf64 := base64.StdEncoding.EncodeToString([]byte(strConf)) // Encode `strConf` to base64
+	envKeyValue := fmt.Sprintf("SESSION_CONFIG=%s\n", baseConf64)    // Convert base64 to string for .env file
+
+	utils.WriteToEnv("SESSION_CONFIG", envKeyValue)
+	fmt.Println("\n\t[✓] SessionConf updated!")
 }
