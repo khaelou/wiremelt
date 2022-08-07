@@ -10,6 +10,7 @@ import (
 
 	"wiremelt/macro"
 	"wiremelt/pilot"
+	//"wiremelt/pilot"
 	"wiremelt/shell"
 	"wiremelt/utils"
 	"wiremelt/wiremelt"
@@ -59,11 +60,13 @@ func main() {
 				Aliases: []string{"w"},
 				Usage:   "Launch Web UI",
 			},
-			&cli.StringFlag{
-				Name:    "pilot",
-				Aliases: []string{"p"},
-				Usage:   "Launch Pilot for Rod",
-			},
+			/*
+				&cli.StringFlag{
+					Name:    "pilot",
+					Aliases: []string{"p"},
+					Usage:   "Launch Pilot for Rod",
+				},
+			*/
 			&cli.StringFlag{
 				Name:        "file",
 				Aliases:     []string{"f"},

@@ -33,7 +33,7 @@ func (ps *ProductSignal) QualityCheck() (bool, error) {
 	return isValid, err
 }
 
-// Converts strings to numeric type for neural network manipulations
+// Converts product to numeral for neural network manipulations
 func (ps *ProductSignal) InitNeuron() (float64, error) {
 	// Convert Product to Numeric Value (string > bytes > vector > float64)
 	parseProduct := fmt.Sprintf("%v", ps.Product) // interface{} to string
