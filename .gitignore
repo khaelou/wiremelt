@@ -2,8 +2,6 @@ custom/
 neural/data
 pilot/
 pilot/extensions/
-pilot/google.go
-pilot/spotify.go
 screenshots/
 utils/
 .env
