@@ -34,10 +34,10 @@ func (wc WriteCounter) PrintProgress() {
 	fmt.Printf("\r\t[...] Downloading - %s complete", humanize.Bytes(wc.Total))
 }
 
-func DownloadTarget(url, filePath string) (bool, string, error) {
+func DownloadTarget(url, filePath string, forMacro bool) (bool, string, error) {
 	fmt.Println("- Download Started @", url)
 
-	err := DownloadFile(url, filePath)
+	err := DownloadFile(url, filePath, forMacro)
 	if err != nil {
 		log.Println(err)
 	}
@@ -50,8 +50,13 @@ func DownloadTarget(url, filePath string) (bool, string, error) {
 // DownloadFile will download a url to a local file. It's efficient because it will
 // write as it downloads and not load the whole file into memory. We pass an io.TeeReader
 // into Copy() to report progress on the download.
-func DownloadFile(url, filePath string) error {
+func DownloadFile(url, filePath string, forMacro bool) error {
 	fileDir := "custom/"
+
+	if !forMacro {
+		fileDir = "custom/files/"
+	}
+
 	if _, err := os.Stat(fileDir); os.IsNotExist(err) { // Folder doesn't exist
 		if err := os.MkdirAll(fileDir, os.ModePerm); err != nil {
 			log.Fatalln("custom folder couldn't be created:", err)

@@ -58,8 +58,8 @@ func StartDispatcher(ctx context.Context, targetFactory Factory, workerCount int
 				useV8Isolates = false
 			}
 
-			SproutedWorkers = append(SproutedWorkers, worker) // Store Worker for reference
 			worker.StartWorker(ctx, useV8Isolates)            // Worker, grabs a waiting job and then does it's task
+			SproutedWorkers = append(SproutedWorkers, worker) // Store Worker for reference
 		}
 	}
 

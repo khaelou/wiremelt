@@ -45,6 +45,7 @@ func checkProductQuality(ctx context.Context, job Job, productSignal macro.Produ
 
 	if qualityCheck { // Product Validated
 		ProductChannel <- productSignal // Send Product to ProductChannel
+		productSignal.InitNeuron()
 	} else {
 		log.Println("\t\t\t\t[x] QUALITY CHECK: product is nil!")
 	}

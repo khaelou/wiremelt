@@ -305,14 +305,14 @@ func PromptSessionConfInit() *SessionConfiguration {
 		fmt.Printf("resultWorkerQtn Error: %v\n", err)
 	}
 
-	// Jobs Per Factory
-	promptJobsPerFactory := promptui.Prompt{
-		Label:    "Jobs Per Factory",
+	// Jobs Per Macro
+	promptJobsPerMacro := promptui.Prompt{
+		Label:    "Jobs Per Macro",
 		Validate: validateFloat,
 	}
-	resultJobsPerFactory, err := promptJobsPerFactory.Run()
+	resultJobsPerMacro, err := promptJobsPerMacro.Run()
 	if err != nil {
-		fmt.Printf("resultJobsPerFactory Error: %v\n", err)
+		fmt.Printf("resultJobsPerMacro Error: %v\n", err)
 	}
 
 	// Factory Focus
@@ -370,7 +370,7 @@ func PromptSessionConfInit() *SessionConfiguration {
 	}
 
 	// Conv JobsPerFactory
-	jobsPerFactory, err := strconv.Atoi(resultJobsPerFactory)
+	jobsPerFactory, err := strconv.Atoi(resultJobsPerMacro)
 	if err != nil {
 		log.Fatalln("jobsPerFactory Error:", err)
 	}

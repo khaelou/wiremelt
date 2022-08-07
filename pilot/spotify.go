@@ -18,13 +18,6 @@ import (
 )
 
 func SpotifySignin() {
-	/*
-		pinkcake@gmail.com:Mid0riba | Plan : Family | Country : US
-		jon.chetrit@gmail.com:Statmotion87 | Plan : Family | Country : US
-		lewis.albon@yahoo.co.nz:4Lancewood | Plan : Family | Country : NZ
-		jo.adamson@xtra.co.nz:pumpkin1 | Plan : Family | Country : NZ
-		jacquie@worklife.co.nz:reina699 | Plan : Family | Country : NZ
-	*/
 	screenshots := "screenshots/"
 
 	loginURL := "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fopen.spotify.com%2Fartist%2F5TDJKVd91S3WHlgmPGibDy"
@@ -49,8 +42,8 @@ func SpotifySignin() {
 	// ** SIGN IN @ Spotify.com **
 	time.Sleep(3 * time.Second)
 
-	page.MustElement("#login-username").MustInput("jon.chetrit@gmail.com") // Email
-	page.MustElement("#login-password").MustInput("Statmotion87")          // Password
+	page.MustElement("#login-username").MustInput("test@example.com") // Email
+	page.MustElement("#login-password").MustInput("wiremelt")         // Password
 
 	time.Sleep(3 * time.Second)
 	page.MustElement("#login-button").MustClick()

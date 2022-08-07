@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+
+	"github.com/atedja/go-vector"
 )
 
 type ProductSignal struct {
@@ -29,6 +31,25 @@ func (ps *ProductSignal) QualityCheck() (bool, error) {
 	}
 
 	return isValid, err
+}
+
+// Converts strings to numeric type for neural network manipulations
+func (ps *ProductSignal) InitNeuron() (float64, error) {
+	// Convert Product to Numeric Value (string > bytes > vector > float64)
+	parseProduct := fmt.Sprintf("%v", ps.Product) // interface{} to string
+	parseBytes := []byte(parseProduct)            // string to bytes
+	floatEncode := []float64{}
+	for _, v := range parseBytes {
+		floatEncode = append(floatEncode, float64(v)) // []byte to []float64
+	}
+
+	productVector := vector.NewWithValues(floatEncode) // []float64 to vector
+	neuronInbound := productVector.Magnitude()
+
+	fmt.Println("\t[✓✓] NEURON_INBOUND:", neuronInbound, "<<", ps.Product, "|", ps.WorkerRole, "@", ps.WorkerFactory)
+	return neuronInbound, nil
+
+	// Add conversion to CSV as training data
 }
 
 // Execute target built-in macro specified in MacroLibrary

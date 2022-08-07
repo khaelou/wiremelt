@@ -30,7 +30,7 @@ func main() {
 	app := &cli.App{
 		Name:        "Wiremelt",
 		Usage:       "Extendible Automation Utility",
-		Description: "Extendible Automation Utility; powers concurrent yet parallel worker-pool operations at scale.",
+		Description: "Extendible automation utility for parallel concurrent worker-pool operations at scale.",
 		Version:     "1.0.0",
 
 		Flags: []cli.Flag{
@@ -142,7 +142,7 @@ func main() {
 						if utils.IsStringValidUrl(importURL) && strings.Contains(importURL, ".js") {
 							macroDest := fmt.Sprintf("%s.js", utils.LowercaseString(genMacroName))
 
-							dlSuccess, customScript, err := utils.DownloadTarget(importURL, macroDest) // Download
+							dlSuccess, customScript, err := utils.DownloadTarget(importURL, macroDest, true) // Download external JS script
 							if err != nil {
 								fmt.Println("\t[x]", specID, "IMPORT", genMacroName, "@", importURL)
 							}

@@ -5,6 +5,7 @@ go 1.18
 require github.com/urfave/cli/v2 v2.10.3
 
 require (
+	github.com/atedja/go-vector v0.0.0-20170318030839-a887ff7bead7 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/go-rod/stealth v0.4.6 // indirect
 	golang.org/x/exp v0.0.0-20220713135740-79cabaa25d75 // indirect
@@ -24,4 +25,5 @@ require (
 	github.com/ysmood/leakless v0.8.0 // indirect
 	golang.org/x/sys v0.0.0-20211019181941-9d821ace8654 // indirect
 	golang.org/x/text v0.3.7
+	gonum.org/v1/gonum v0.11.0
 )
