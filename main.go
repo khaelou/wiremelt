@@ -9,8 +9,6 @@ import (
 	"strings"
 
 	"wiremelt/macro"
-	"wiremelt/pilot"
-	//"wiremelt/pilot"
 	"wiremelt/shell"
 	"wiremelt/utils"
 	"wiremelt/wiremelt"
@@ -250,8 +248,8 @@ func main() {
 					shell.InitShell(macroSpec)
 				case "web":
 					// WebAssembly
-				case "pilot":
-					pilot.InitPilot()
+				//case "pilot":
+				//	pilot.InitPilot()
 				case "file":
 					fmt.Println("LOAD FILE")
 				default:
