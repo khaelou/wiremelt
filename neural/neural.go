@@ -15,32 +15,34 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-func InitNeuralNetwork() {
+func InitNeuralNetwork() float64 {
+	filePath := "neural/data/train.csv"
+
 	// Form the training matrices.
-	inputs, labels := makeInputsAndLabels("data/train.csv")
+	inputs, labels := makeInputsAndLabels(filePath)
 
 	// Define our network architecture and learning parameters.
 	config := neuralNetConfig{
-		inputNeurons:  4,
-		outputNeurons: 3,
-		hiddenNeurons: 3,
-		numEpochs:     5000,
-		learningRate:  0.3,
+		inputNeurons:  4,    // 4
+		outputNeurons: 3,    // 3
+		hiddenNeurons: 3,    // 3
+		numEpochs:     5000, // 5000
+		learningRate:  0.3,  // 0.3
 	}
 
 	// Train the neural network.
 	network := newNetwork(config)
 	if err := network.train(inputs, labels); err != nil {
-		log.Fatal(err)
+		log.Fatal("neuralTrainError", err)
 	}
 
 	// Form the testing matrices.
-	testInputs, testLabels := makeInputsAndLabels("data/test.csv")
+	testInputs, testLabels := makeInputsAndLabels("neural/data/test.csv")
 
 	// Make the predictions using the trained model.
 	predictions, err := network.predict(testInputs)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("neuralPredsError", err)
 	}
 
 	// Calculate the accuracy of our model.
@@ -68,7 +70,11 @@ func InitNeuralNetwork() {
 	accuracy := float64(truePosNeg) / float64(numPreds)
 
 	// Output the Accuracy value to standard out.
-	fmt.Printf("\nAccuracy = %0.2f\n\n", accuracy)
+	if accuracy > 0 {
+		fmt.Printf("\t\t[!] Accuracy = %0.2f\n", accuracy)
+	}
+
+	return accuracy
 }
 
 // neuralNet contains all of the information
@@ -143,7 +149,6 @@ func (nn *neuralNet) train(x, y *mat.Dense) error {
 
 // backpropagate completes the backpropagation method.
 func (nn *neuralNet) backpropagate(x, y, wHidden, bHidden, wOut, bOut, output *mat.Dense) error {
-
 	// Loop over the number of epochs utilizing
 	// backpropagation to train our model.
 	for i := 0; i < nn.config.numEpochs; i++ {
@@ -299,12 +304,12 @@ func makeInputsAndLabels(fileName string) (*mat.Dense, *mat.Dense) {
 
 	// Create a new CSV reader reading from the opened file.
 	reader := csv.NewReader(f)
-	reader.FieldsPerRecord = 7
+	reader.FieldsPerRecord = 1 // 7 (macro.Product)
 
 	// Read in all of the CSV records
 	rawCSVData, err := reader.ReadAll()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("csvReadError: ", err)
 	}
 
 	// inputsData and labelsData will hold all the
@@ -320,8 +325,8 @@ func makeInputsAndLabels(fileName string) (*mat.Dense, *mat.Dense) {
 	// Sequentially move the rows into a slice of floats.
 	for idx, record := range rawCSVData {
 
-		// Skip the header row.
-		if idx == 0 {
+		// Skip the header rows.
+		if idx == 0 || idx == 1 {
 			continue
 		}
 
@@ -331,7 +336,7 @@ func makeInputsAndLabels(fileName string) (*mat.Dense, *mat.Dense) {
 			// Convert the value to a float.
 			parsedVal, err := strconv.ParseFloat(val, 64)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("csvParseError: ", err)
 			}
 
 			// Add to the labelsData if relevant.
@@ -346,6 +351,7 @@ func makeInputsAndLabels(fileName string) (*mat.Dense, *mat.Dense) {
 			inputsIndex++
 		}
 	}
+
 	inputs := mat.NewDense(len(rawCSVData), 4, inputsData)
 	labels := mat.NewDense(len(rawCSVData), 3, labelsData)
 	return inputs, labels

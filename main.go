@@ -83,10 +83,9 @@ func main() {
 			}
 
 			fmt.Println("\n\tWIREMELT")
+			//fmt.Println()
 
 			if context.Args().Len() > 0 {
-				fmt.Println()
-
 				flag := context.Args().Get(0)
 
 				switch flag {
@@ -245,6 +244,7 @@ func main() {
 					}
 				case "shell":
 					macroSpec := wiremelt.LoadSessionConfiguration().MacroLibrary
+					wiremelt.WiremeltAscii()
 					shell.InitShell(macroSpec)
 				case "web":
 					// WebAssembly
@@ -274,6 +274,8 @@ func main() {
 					} else {
 						session = wiremelt.PromptSessionConfInit()
 					}
+
+					// ** Check if Node.js is installed, install if not found on system
 
 					session.StartSession(client)
 				}

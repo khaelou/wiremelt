@@ -52,7 +52,7 @@ func newClientConfig(connDB helpers.DatabaseConnection, connReCaptcha helpers.Tw
 
 // View contents of ClientConfiguration
 func (config *ClientConfiguration) Read() {
-	fmt.Printf("\n\tClient-Configuration: [DBConn] %v | [ReCaptcha] %v | [Proxy] %v", config.DBConn, config.ReCaptcha, config.Proxy)
+	fmt.Printf("\n\tClient-Configuration: [DBConn] %v | [2Captcha] %v | [Proxy] %v", config.DBConn, config.ReCaptcha, config.Proxy)
 	fmt.Println("")
 }
 

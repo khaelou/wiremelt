@@ -30,16 +30,19 @@ func InitShell(spec worker.MacroSpec) {
 			fmt.Fprintln(os.Stderr, err)
 		}
 
-		if strings.Contains(input, "*sys") {
-			cmdOpr := strings.Replace(input, "*sys", "", -1) // Remove operator for cmd execution
-			input = strings.TrimSpace(cmdOpr)
+		if strings.Contains(input, "*force") { // *force used to execute command on underlying system
+			// Prevent self-execution of software within shell
+			if !strings.Contains(input, "go run") && !strings.Contains(input, "wiremelt") {
+				cmdOpr := strings.Replace(input, "*force", "", -1) // Remove operator for cmd execution
+				input = strings.TrimSpace(cmdOpr)
 
-			// Handle the execution of the input.
-			if err = execSysInput(input); err != nil {
-				fmt.Fprintln(os.Stderr, err)
+				// Handle the execution of the input
+				if err = execSysInput(input); err != nil {
+					fmt.Fprintln(os.Stderr, err)
+				}
 			}
 		} else {
-			// Handle the execution of the input.
+			// Handle the execution of the input
 			input, err := execInput(input)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -54,8 +57,7 @@ func execInput(input string) (string, error) {
 		return "", errors.New("no input")
 	}
 
-	// Remove the newline character.
-	input = strings.TrimSuffix(input, "\n")
+	input = strings.TrimSuffix(input, "\n") // Remove the newline character.
 
 	return input, nil
 }

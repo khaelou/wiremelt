@@ -3,7 +3,10 @@ package wiremelt
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"wiremelt/shell"
@@ -16,6 +19,20 @@ var sess SessionConfiguration
 func InitClient(session *SessionConfiguration) {
 	fmt.Println()
 	fmt.Println("CLIENT INIT")
+
+	// Remove previous input / training data
+	removeCSV := func(filePath string) {
+		_, err := os.Stat(filePath)
+		if err != nil {
+			_ = err // Ignore
+		} else {
+			removeTrainCSV := os.Remove(filePath)
+			if removeTrainCSV != nil {
+				log.Fatalln(removeTrainCSV)
+			}
+		}
+	}
+	removeCSV("neural/data/train.csv")
 
 	sess = *session
 	ctx, cancel := context.WithCancel(context.TODO())
@@ -61,8 +78,41 @@ func constructFactories(ctx context.Context, cancel context.CancelFunc, factorie
 				defer shell.InitShell(sess.MacroLibrary)
 			}
 
+			// Copy input / training data
+			trainFile, err := ioutil.ReadFile("neural/data/train.csv")
+			if err != nil {
+				_ = err // Ignore
+			}
+			trainLines := string(trainFile)
+			trainFileLines := strings.Split(trainLines, "\n")
+
+			// Retrieve test data for line count
+			testFile, err := ioutil.ReadFile("neural/data/test.csv")
+			if err != nil {
+				_ = err // Ignore
+			}
+			testLines := string(testFile)
+			testFileLines := strings.Split(testLines, "\n")
+
+			// Ensure test data is only updated if under
+			if len(testFileLines) < 100000 { // 100,000
+				// Update test data with copied input / training data
+				output := strings.Join(trainFileLines, "\n")
+				testData, updateErr := os.OpenFile("neural/data/test.csv", os.O_APPEND|os.O_WRONLY, 0644)
+				if updateErr != nil {
+					log.Fatalln(updateErr)
+				}
+				defer testData.Close()
+
+				update := fmt.Sprintf("\n%v", strings.TrimSpace(output))
+				_, writeErr := testData.WriteString(update)
+				if writeErr != nil {
+					log.Fatalln(writeErr)
+				}
+			}
+
 			fmt.Println("DONE.")
-			fmt.Println()
+			WiremeltAscii()
 		}
 	}()
 }

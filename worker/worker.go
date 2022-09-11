@@ -45,9 +45,15 @@ func checkProductQuality(ctx context.Context, job Job, productSignal macro.Produ
 
 	if qualityCheck { // Product Validated
 		ProductChannel <- productSignal // Send Product to ProductChannel
-		productSignal.InitNeuron()
+		neuron, accuracy, err := productSignal.InitNeuron()
+		if err != nil {
+			log.Println("initNeuron error:", err)
+		}
+
+		qc := fmt.Sprintf("\t[!!] #%d NEURON_OUTBOUND: (macro.%s) Accuracy = %f [Neuron - %v]", job.ID, job.Macro, accuracy, neuron)
+		fmt.Println(qc)
 	} else {
-		log.Println("\t\t\t\t[x] QUALITY CHECK: product is nil!")
+		fmt.Println("\t\t\t[xX] QUALITY CHECK: product is nil!")
 	}
 }
 
