@@ -50,7 +50,7 @@ func checkProductQuality(ctx context.Context, job Job, productSignal macro.Produ
 			log.Println("initNeuron error:", err)
 		}
 
-		qc := fmt.Sprintf("\t[!!] #%d NEURON_OUTBOUND: (macro.%s) Accuracy = %f [Neuron - %v]", job.ID, job.Macro, accuracy, neuron)
+		qc := fmt.Sprintf("\t[!✓] #%d NEURON_OUTBOUND: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
 		fmt.Println(qc)
 	} else {
 		fmt.Println("\t\t\t[xX] QUALITY CHECK: product is nil!")

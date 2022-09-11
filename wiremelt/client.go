@@ -67,6 +67,9 @@ func constructFactories(ctx context.Context, cancel context.CancelFunc, factorie
 	}()
 
 	defer func() {
+		trainFilePath := "neural/data/train.csv"
+		testFilePath := "neural/data/test.csv"
+
 		repeatCycle := session.RepeatCycle != 0
 		shellCycle := session.ShellCycle != 0
 
@@ -79,7 +82,7 @@ func constructFactories(ctx context.Context, cancel context.CancelFunc, factorie
 			}
 
 			// Copy input / training data
-			trainFile, err := ioutil.ReadFile("neural/data/train.csv")
+			trainFile, err := ioutil.ReadFile(trainFilePath)
 			if err != nil {
 				_ = err // Ignore
 			}
@@ -87,18 +90,27 @@ func constructFactories(ctx context.Context, cancel context.CancelFunc, factorie
 			trainFileLines := strings.Split(trainLines, "\n")
 
 			// Retrieve test data for line count
-			testFile, err := ioutil.ReadFile("neural/data/test.csv")
+			testFile, err := ioutil.ReadFile(testFilePath)
 			if err != nil {
+				// Create Test file
+				f, envInitErr := os.Create(testFilePath)
+				if envInitErr != nil {
+					log.Fatalln(err, envInitErr)
+				}
+				defer f.Close()
+
+				testFile, _ = ioutil.ReadFile(testFilePath)
+
 				_ = err // Ignore
 			}
 			testLines := string(testFile)
 			testFileLines := strings.Split(testLines, "\n")
 
 			// Ensure test data is only updated if under
-			if len(testFileLines) < 100000 { // 100,000
+			if len(testFileLines) < 14000 { // 14,000
 				// Update test data with copied input / training data
 				output := strings.Join(trainFileLines, "\n")
-				testData, updateErr := os.OpenFile("neural/data/test.csv", os.O_APPEND|os.O_WRONLY, 0644)
+				testData, updateErr := os.OpenFile(testFilePath, os.O_APPEND|os.O_WRONLY, 0644)
 				if updateErr != nil {
 					log.Fatalln(updateErr)
 				}

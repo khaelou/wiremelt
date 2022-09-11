@@ -96,10 +96,19 @@ func (ps *ProductSignal) InitNeuron() (float64, float64, error) {
 	}
 	csvWriter.Flush()
 
-	neuron := fmt.Sprintf("\t[✓✓] #%d NEURON_INBOUND: (macro.%s) Product = %v (%s @ %s) [Neuron - %f]", ps.JobID, ps.Macro, ps.Product, ps.WorkerRole, ps.WorkerFactory, neuronInbound)
+	neuron := fmt.Sprintf("\t[✓✓] #%d NEURON_INBOUND: (macro.%s) Product = \"%v\" (%s @ %s) [Neuron = %f]", ps.JobID, ps.Macro, ps.Product, ps.WorkerRole, ps.WorkerFactory, neuronInbound)
 	fmt.Println(neuron)
 
-	accuracy := neural.InitNeuralNetwork() // Neural Network for manipulations
+	var accuracy float64
+	testFilePath := "neural/data/test.csv"
+	_, testFileErr := os.Stat(testFilePath)
+	if testFileErr != nil {
+		accuracy = 0
+		_ = testFileErr // Ignore
+	} else {
+		accuracy = neural.InitNeuralNetwork() // Call to Neural Network for manipulations
+	}
+
 	tarCSV.Close()
 	return neuronInbound, accuracy, nil
 }
