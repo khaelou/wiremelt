@@ -58,6 +58,8 @@ func StartDispatcher(ctx context.Context, targetFactory Factory, workerCount int
 				useV8Isolates = false
 			}
 
+			ctx = context.WithValue(ctx, "neuralEnabled", session.NeuralEnabled) // Pass required data into contextz
+
 			worker.StartWorker(ctx, useV8Isolates)            // Worker, grabs a waiting job and then does it's task
 			SproutedWorkers = append(SproutedWorkers, worker) // Store Worker for reference
 		}

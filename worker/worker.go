@@ -43,14 +43,14 @@ func checkProductQuality(ctx context.Context, job Job, productSignal macro.Produ
 		log.Println("checkProductQuality error:", err)
 	}
 
-	if qualityCheck { // Product Validated
+	if qualityCheck { // Product Validated for Neural Network
 		ProductChannel <- productSignal // Send Product to ProductChannel
 		neuron, accuracy, err := productSignal.InitNeuron()
 		if err != nil {
 			log.Println("initNeuron error:", err)
 		}
 
-		qc := fmt.Sprintf("\t[!✓] #%d NEURON_OUTBOUND: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
+		qc := fmt.Sprintf("\t[!✓] #%d NEURON_RESULT: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
 		fmt.Println(qc)
 	} else {
 		fmt.Println("\t\t\t[xX] QUALITY CHECK: product is nil!")
@@ -59,6 +59,8 @@ func checkProductQuality(ctx context.Context, job Job, productSignal macro.Produ
 
 // Start Worker
 func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
+	neuralEnabled := ctx.Value("neuralEnabled") != 0
+
 	go func() {
 		for {
 			w.WorkerChannel <- w.JobChannel // When the worker is available place channel in queue
@@ -78,7 +80,13 @@ func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
 					product := macro.ExecuteMacro(w.ID, w.Factory, w.Role, job.ID, job.Macro, job.ParamArg, execMacro) // Macro execution, returns product or nil
 
 					ctx = context.WithValue(ctx, job, execMacro) // parent context, key, value
-					checkProductQuality(ctx, job, product)
+
+					if neuralEnabled {
+						checkProductQuality(ctx, job, product)
+					} else {
+						qcBypass := fmt.Sprintf("[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
+						fmt.Println(qcBypass)
+					}
 				} else { // Custom / External Macro
 					jsScript := fmt.Sprintf("%s%s", MacroFileDir, job.ParamArg) // custom/macro.js
 					if _, err := os.Stat(jsScript); !os.IsNotExist(err) {
@@ -108,7 +116,13 @@ func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
 						product := macro.ExecuteMacro(w.ID, w.Factory, w.Role, job.ID, job.Macro, jsScript, execMacro) // Macro execution, returns product or nil
 
 						ctx = context.WithValue(ctx, job, execMacro) // parent context, key, value
-						checkProductQuality(ctx, job, product)
+
+						if neuralEnabled {
+							checkProductQuality(ctx, job, product)
+						} else {
+							qcBypass := fmt.Sprintf("[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
+							fmt.Println(qcBypass)
+						}
 					}
 				}
 			case <-w.EndShift: // Worker has completed job, return to WorkerChannel to wait for the next available job

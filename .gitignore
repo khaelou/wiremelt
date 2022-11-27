@@ -1,5 +1,6 @@
 custom/
-neural/data
+neural/data/test.csv
+neural/data/train.csv
 pilot/
 pilot/extensions/
 screenshots/

@@ -71,25 +71,29 @@ type SessionConfiguration struct {
 	CPUCores        int              `json:"cpuCores"`
 	FactoryQuantity int              `json:"factoryQuantity"`
 	WorkerQuantity  int              `json:"workerQuantity"`
-	JobsPerFactory  int              `json:"jobsPerFactory"`
+	JobsPerMacro    int              `json:"jobsPerMacro"`
 	FactoryFocus    map[int]string   `json:"factoryFocus"`
 	WorkerRoles     map[int]string   `json:"workerRoles"`
 	MacroLibrary    worker.MacroSpec `json:"macroLibrary"`
 	ShellCycle      int              `json:"shellCycle"`
+	NeuralEnabled   int              `json:"neuralEnabled"`
+	TrainLimit      int              `json:"trainLimit"`
 }
 
 // Initiate New Session confiuration
-func NewSessionConfig(repeatCycle, cpuCores, factoryQuantity, workerQuantity int, jobsPerFactory int, factoryFocus map[int]string, workerRoles map[int]string, macroSpec worker.MacroSpec, shellCycle int) *SessionConfiguration {
+func NewSessionConfig(repeatCycle, cpuCores, factoryQuantity, workerQuantity int, jobsPerMacro int, factoryFocus map[int]string, workerRoles map[int]string, macroSpec worker.MacroSpec, shellCycle int, neuralEnabled int, trainLimit int) *SessionConfiguration {
 	config := SessionConfiguration{
 		RepeatCycle:     repeatCycle,
 		CPUCores:        cpuCores,
 		FactoryQuantity: factoryQuantity,
 		WorkerQuantity:  workerQuantity,
-		JobsPerFactory:  jobsPerFactory,
+		JobsPerMacro:    jobsPerMacro,
 		FactoryFocus:    factoryFocus,
 		WorkerRoles:     workerRoles,
 		MacroLibrary:    macroSpec,
 		ShellCycle:      shellCycle,
+		NeuralEnabled:   neuralEnabled,
+		TrainLimit:      trainLimit,
 	}
 
 	return &config
@@ -297,7 +301,7 @@ func PromptSessionConfInit() *SessionConfiguration {
 
 	// Worker Quantity
 	promptWorkerQtn := promptui.Prompt{
-		Label:    "Worker Quantity",
+		Label:    "Workers Per Factory",
 		Validate: validateFloat,
 	}
 	resultWorkerQtn, err := promptWorkerQtn.Run()
@@ -307,7 +311,7 @@ func PromptSessionConfInit() *SessionConfiguration {
 
 	// Jobs Per Macro
 	promptJobsPerMacro := promptui.Prompt{
-		Label:    "Jobs Per Macro",
+		Label:    fmt.Sprintf("Jobs Per Macro (x%s)", resultWorkerQtn),
 		Validate: validateFloat,
 	}
 	resultJobsPerMacro, err := promptJobsPerMacro.Run()
@@ -317,7 +321,7 @@ func PromptSessionConfInit() *SessionConfiguration {
 
 	// Factory Focus
 	promptFactoryFocus := promptui.Prompt{
-		Label:    "Factory Focus / Dept",
+		Label:    fmt.Sprintf("Factory Focus (x%s)", resultFactoryQtn),
 		Validate: validateString,
 	}
 	resultFactoryFocus, err := promptFactoryFocus.Run()
@@ -327,7 +331,7 @@ func PromptSessionConfInit() *SessionConfiguration {
 
 	// Worker Roles
 	promptWorkerRoles := promptui.Prompt{
-		Label:    "Worker Roles",
+		Label:    fmt.Sprintf("Worker Role / Label (x%s)", resultWorkerQtn),
 		Validate: validateString,
 	}
 	resultWorkerRoles, err := promptWorkerRoles.Run()
@@ -337,12 +341,32 @@ func PromptSessionConfInit() *SessionConfiguration {
 
 	// Macro Spec
 	promptMacroSpec := promptui.Prompt{
-		Label:    "Macro Spec",
+		Label:    "Macro Specification",
 		Validate: validateString,
 	}
 	resultMacroSpec, err := promptMacroSpec.Run()
 	if err != nil {
 		fmt.Printf("resultMacroSpec Error: %v\n", err)
+	}
+
+	// Neural Enabled
+	promptNeuralEnabled := promptui.Select{
+		Label: "Neural Network?",
+		Items: []string{"No", "Yes"},
+	}
+	_, resultNeuralEnabled, err := promptNeuralEnabled.Run()
+	if err != nil {
+		log.Fatalln("resultNeuralEnabled Error:", err)
+	}
+
+	// Train Limit
+	promptTrainLimit := promptui.Prompt{
+		Label:    "Train Limit",
+		Validate: validateFloat,
+	}
+	resultTrainLimit, err := promptTrainLimit.Run()
+	if err != nil {
+		fmt.Printf("resultTrainLimit Error: %v\n", err)
 	}
 
 	// Conv RepeatCycle
@@ -369,10 +393,10 @@ func PromptSessionConfInit() *SessionConfiguration {
 		log.Fatalln("workerQtn Error:", err)
 	}
 
-	// Conv JobsPerFactory
-	jobsPerFactory, err := strconv.Atoi(resultJobsPerMacro)
+	// Conv JobsPerMacro
+	jobsPerMacro, err := strconv.Atoi(resultJobsPerMacro)
 	if err != nil {
-		log.Fatalln("jobsPerFactory Error:", err)
+		log.Fatalln("jobsPerMacro Error:", err)
 	}
 
 	// Conv FactoryFocus
@@ -413,7 +437,7 @@ func PromptSessionConfInit() *SessionConfiguration {
 	for _, macro := range specMap {
 		if !strings.Contains(macro, "*") { // * denotes to ignore passed paramArg
 			promptMacroParam := promptui.Prompt{
-				Label:    fmt.Sprintf("Macro `%s` Param", macro),
+				Label:    fmt.Sprintf("Macro `%s` Param / Script", macro),
 				Validate: validateString,
 			}
 			resultMacroParam, err := promptMacroParam.Run()
@@ -425,6 +449,15 @@ func PromptSessionConfInit() *SessionConfiguration {
 		} else {
 			worker.MacroSpecs[macro] = "" // job.paramArg
 		}
+	}
+
+	// Conv NeuralEnabled
+	neuralEnabled := utils.YesNoToInt(resultNeuralEnabled)
+
+	// Conv TrainLimit
+	trainLimit, err := strconv.Atoi(resultTrainLimit)
+	if err != nil {
+		log.Fatalln("trainLimit Error:", err)
 	}
 
 	// Shell
@@ -447,8 +480,8 @@ func PromptSessionConfInit() *SessionConfiguration {
 
 	macroSpec := worker.MacroSpecs
 
-	newConf := *NewSessionConfig(repeatCycle, cpuCores, factoryQtn, workerQtn, jobsPerFactory, factoryFocus, workerRoles, macroSpec, shellCycle) // Initialize SessionConfiguration with input values
-	conf, err := json.Marshal(newConf)                                                                                                           // Convert SessionConfiguration to JSON object
+	newConf := *NewSessionConfig(repeatCycle, cpuCores, factoryQtn, workerQtn, jobsPerMacro, factoryFocus, workerRoles, macroSpec, shellCycle, neuralEnabled, trainLimit) // Initialize SessionConfiguration with input values
+	conf, err := json.Marshal(newConf)                                                                                                                                    // Convert SessionConfiguration to JSON object
 	if err != nil {
 		log.Println(err)
 	}

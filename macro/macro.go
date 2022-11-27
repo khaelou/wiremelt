@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+
 	"wiremelt/neural"
 
 	"github.com/atedja/go-vector"
@@ -51,9 +52,7 @@ func (ps *ProductSignal) InitNeuron() (float64, float64, error) {
 	productVector := vector.NewWithValues(floatEncode) // []float64 to vector
 	neuronInbound := productVector.Magnitude()
 
-	//fmt.Println("\t[✓✓] NEURON_INBOUND:", neuronInbound, "<<", ps.Product, "|", ps.WorkerRole, "@", ps.WorkerFactory)
-	//return neuronInbound, nil
-
+	// Train CSV
 	var tarCSV *os.File
 	csvData := [][]string{ // Create data array to write to csv file
 		//{"Macro", "ParamArg", "Product"},
@@ -65,6 +64,7 @@ func (ps *ProductSignal) InitNeuron() (float64, float64, error) {
 		// Create CSV file
 		targetCSV, csvInitErr := os.Create("neural/data/train.csv")
 		if csvInitErr != nil {
+			fmt.Println("TRAIN_CSV_ERROR")
 			log.Fatalln(err, csvInitErr)
 		}
 
@@ -96,7 +96,7 @@ func (ps *ProductSignal) InitNeuron() (float64, float64, error) {
 	}
 	csvWriter.Flush()
 
-	neuron := fmt.Sprintf("\t[✓✓] #%d NEURON_INBOUND: (macro.%s) Product = \"%v\" (%s @ %s) [Neuron = %f]", ps.JobID, ps.Macro, ps.Product, ps.WorkerRole, ps.WorkerFactory, neuronInbound)
+	neuron := fmt.Sprintf("\t[✓✓] #%d NEURON_INIT: (macro.%s) Product = \"%v\" (%s @ %s) [Neuron = %f]", ps.JobID, ps.Macro, ps.Product, ps.WorkerRole, ps.WorkerFactory, neuronInbound)
 	fmt.Println(neuron)
 
 	var accuracy float64

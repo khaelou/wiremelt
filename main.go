@@ -23,61 +23,19 @@ func main() {
 	var client *wiremelt.ClientConfiguration
 	var session *wiremelt.SessionConfiguration
 
-	var file string
-
 	// CLI Initialization
 	app := &cli.App{
 		Name:        "Wiremelt",
 		Usage:       "Extendible Automation Utility",
-		Description: "Extendible automation utility for parallel concurrent worker-pool operations at scale.",
+		Description: "Utility for parallel concurrent worker-pool operations at scale.",
 		Version:     "1.0.0",
 
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "client",
-				Aliases: []string{"c"},
-				Usage:   "Setup new Client Configuration",
-			},
-			&cli.StringFlag{
-				Name:    "session",
-				Aliases: []string{"s"},
-				Usage:   "Setup new Session Configuration",
-			},
-			&cli.StringFlag{
-				Name:    "macro",
-				Aliases: []string{"m"},
-				Usage:   "Macro Library / Import Custom Macro",
-			},
-			&cli.StringFlag{
-				Name:    "shell",
-				Aliases: []string{"sh"},
-				Usage:   "Launch Shell",
-			},
-			&cli.StringFlag{
-				Name:    "web",
-				Aliases: []string{"w"},
-				Usage:   "Launch Web UI",
-			},
-			/*
-				&cli.StringFlag{
-					Name:    "pilot",
-					Aliases: []string{"p"},
-					Usage:   "Launch Pilot for Rod",
-				},
-			*/
-			&cli.StringFlag{
-				Name:        "file",
-				Aliases:     []string{"f"},
-				Destination: &file,
-				Usage:       "Load File",
-			},
-		},
 		Action: func(context *cli.Context) error {
 			// Strings
 			validateString := func(input string) error {
 				isString := utils.CheckStringForEmptiness(input)
 				if !isString {
-					return errors.New("invalid Input")
+					return errors.New("invalid input error")
 				}
 				return nil
 			}
@@ -172,8 +130,8 @@ func main() {
 
 									if wiremelt.DoesEnvFileExist() {
 										existingSession := wiremelt.LoadSessionConfiguration()
-										maps.Copy(existingSession.MacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                        // Copy local macroSpecs into saved sessionConf
-										newConf := wiremelt.NewSessionConfig(existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerFactory, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle) // Initialize SessionConfiguration with input values
+										maps.Copy(existingSession.MacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                                                                                 // Copy local macroSpecs into saved sessionConf
+										newConf := wiremelt.NewSessionConfig(existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerMacro, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle, existingSession.NeuralEnabled, existingSession.TrainLimit) // Initialize SessionConfiguration with input values
 										newConf.UpdateSessionConfiguration()
 									} else {
 										fmt.Println("\n+ TEMP MACRO LIBRARY:", worker.MacroSpecs)
@@ -195,8 +153,8 @@ func main() {
 								worker.MacroSpecs[importName] = importURL
 
 								if wiremelt.DoesEnvFileExist() {
-									maps.Copy(existingMacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                                // Copy local macroSpecs into saved sessionConf
-									newConf := wiremelt.NewSessionConfig(existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerFactory, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle) // Initialize SessionConfiguration with input values
+									maps.Copy(existingMacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                                                                                         // Copy local macroSpecs into saved sessionConf
+									newConf := wiremelt.NewSessionConfig(existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerMacro, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle, existingSession.NeuralEnabled, existingSession.TrainLimit) // Initialize SessionConfiguration with input values
 									newConf.UpdateSessionConfiguration()
 								} else {
 									fmt.Println("\n+ TEMP MACRO LIBRARY:", worker.MacroSpecs)
@@ -234,7 +192,7 @@ func main() {
 						if _, ok := macroSpec[parseTarget]; ok {
 							delete(macroSpec, parseTarget)
 
-							newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerFactory, sessConf.FactoryFocus, sessConf.WorkerRoles, macroSpec, sessConf.ShellCycle) // Initialize SessionConfiguration with input values
+							newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, macroSpec, sessConf.ShellCycle, sessConf.NeuralEnabled, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
 							newConf.UpdateSessionConfiguration()
 
 							fmt.Println("\n- MACRO LIBRARY:", macroSpec)
@@ -250,8 +208,6 @@ func main() {
 					// WebAssembly
 				//case "pilot":
 				//	pilot.InitPilot()
-				case "file":
-					fmt.Println("LOAD FILE")
 				default:
 					fmt.Printf("Flag: `%v`\n", flag) // .Get(i) obtains element by index from cli.Context.Args()
 				}
