@@ -41,9 +41,18 @@ wiremelt macro SayHi https://example.khaelou.com/sayHi.js
 ```
 wiremelt del
 ```
-> **Shell** enables UNIX access, a **force* operator embeds system comamnds for further usability.
+> **Shell** provides a built-in command-line interface with commands for additional extendability.
 ```
 wiremelt shell
+```
+> A **force* operator enables UNIX access which embeds system commands for further usability.
+```
+>_ ] wiremelt@wm-iMac.local
+
+    [✓][1] HelloWorld .: Surveyor @ Apples :: (#1) PRODUCT = "Hello, world! & Green Apples"
+ls -a *force 
+.               .etc
+..              .gitignore            LICENSE
 ```
 > **Web** launches Web UI client in default web browser, powered by WebAssembly.
 ```

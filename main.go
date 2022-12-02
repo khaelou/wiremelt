@@ -209,7 +209,7 @@ func main() {
 							} else if strings.Contains(importURL, ".js") { // Custom Macro
 								addNewMacro()
 							} else {
-								log.Fatalln("[x] macro import must reference a default macro or (.js) JavaScript file.")
+								log.Fatalln("\t[x] macro import must reference a default macro or (.js) JavaScript file.")
 							}
 						}
 					}
@@ -241,7 +241,7 @@ func main() {
 							fmt.Println("\n- MACRO LIBRARY:", macroSpec)
 						}
 					} else {
-						log.Fatalln("[x] macro del requires a session configuration with specified macros.")
+						log.Fatalln("\t[x] macro del requires a session configuration with specified macros.")
 					}
 				case "shell":
 					macroSpec := wiremelt.LoadSessionConfiguration().MacroLibrary
@@ -262,7 +262,7 @@ func main() {
 						fmt.Println("\n~ (dnd) Neural Enabled Session:", "No")
 						StartClient(&newConf, "dnd")
 					} else {
-						log.Fatalln("[x] dnd (Do Not Disturb) requires a session configuration with NeuralEnabled.")
+						log.Fatalln("\t[x] dnd (Do Not Disturb) requires a session configuration with NeuralEnabled.")
 					}
 				case "nnet":
 					// "NNET" (Neural Network) activates Neural Network executions for sessions which are not NeuralEnabled
@@ -275,7 +275,7 @@ func main() {
 						fmt.Println("\n~ (nnet) Neural Enabled Session:", "Yes")
 						StartClient(&newConf, "nnet")
 					} else {
-						log.Fatalln("[x] nnet requires a session configuration with NeuralEnabled.")
+						log.Fatalln("\t[x] nnet requires a session configuration with NeuralEnabled.")
 					}
 				default:
 					fmt.Printf("Flag: `%v`\n", flag) // .Get(i) obtains element by index from cli.Context.Args()

@@ -50,7 +50,7 @@ func checkProductQuality(ctx context.Context, job Job, productSignal macro.Produ
 			log.Println("initNeuron error:", err)
 		}
 
-		qc := fmt.Sprintf("\t[!✓] #%d NEURON_RESULT: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
+		qc := fmt.Sprintf("\t\t\t[!✓] #%d NEURON_RESULT: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
 		fmt.Println(qc)
 	} else {
 		fmt.Println("\t\t\t[xX] QUALITY CHECK: product is nil!")
@@ -84,7 +84,7 @@ func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
 					if neuralEnabled {
 						checkProductQuality(ctx, job, product)
 					} else {
-						qcBypass := fmt.Sprintf("[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
+						qcBypass := fmt.Sprintf("\t[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
 						fmt.Println(qcBypass)
 					}
 				} else { // Custom / External Macro
@@ -120,7 +120,7 @@ func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
 						if neuralEnabled {
 							checkProductQuality(ctx, job, product)
 						} else {
-							qcBypass := fmt.Sprintf("[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
+							qcBypass := fmt.Sprintf("\t[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
 							fmt.Println(qcBypass)
 						}
 					}

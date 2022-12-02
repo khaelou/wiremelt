@@ -86,7 +86,7 @@ func StartDispatcher(ctx context.Context, targetFactory Factory, workerCount int
 				}
 			case signal := <-worker.ProductChannel:
 				macroID := fmt.Sprintf("macro.%s", signal.Macro)
-				fmt.Printf("[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"\n", signal.WorkerID, macroID, signal.WorkerRole, signal.WorkerFactory, signal.JobID, signal.Product)
+				fmt.Printf("\t[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"\n", signal.WorkerID, macroID, signal.WorkerRole, signal.WorkerFactory, signal.JobID, signal.Product)
 			case job := <-input:
 				worker := <-WorkerChannel // Wait for available worker on channel
 				worker <- job             // Dispatch job to worker waiting on channel
