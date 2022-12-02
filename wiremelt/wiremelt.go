@@ -311,7 +311,7 @@ func PromptSessionConfInit() *SessionConfiguration {
 
 	// Jobs Per Macro
 	promptJobsPerMacro := promptui.Prompt{
-		Label:    fmt.Sprintf("Jobs Per Macro (x%s)", resultWorkerQtn),
+		Label:    "Jobs Per Macro (Workload)",
 		Validate: validateFloat,
 	}
 	resultJobsPerMacro, err := promptJobsPerMacro.Run()
@@ -331,7 +331,7 @@ func PromptSessionConfInit() *SessionConfiguration {
 
 	// Worker Roles
 	promptWorkerRoles := promptui.Prompt{
-		Label:    fmt.Sprintf("Worker Role / Label (x%s)", resultWorkerQtn),
+		Label:    fmt.Sprintf("Worker Role (x%s)", resultWorkerQtn),
 		Validate: validateString,
 	}
 	resultWorkerRoles, err := promptWorkerRoles.Run()
