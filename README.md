@@ -37,7 +37,7 @@ wiremelt macro
 wiremelt macro SayHi https://example.khaelou.com/sayHi.js
 ```
 
-> **Del** deletes the target macro from the client's Macro Library.
+> **Del** removes the target macro from the Macro Library.
 ```
 wiremelt del
 ```
@@ -45,7 +45,7 @@ wiremelt del
 ```
 wiremelt shell
 ```
-> A **force* operator enables UNIX access which embeds system commands for further usability.
+> A **force* operator enables UNIX access, which embeds system commands for further usability.
 ```
 >_ ] wiremelt@wm-iMac.local
 
