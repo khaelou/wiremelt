@@ -23,6 +23,49 @@ func main() {
 	var client *wiremelt.ClientConfiguration
 	var session *wiremelt.SessionConfiguration
 
+	StartClient := func(sessionConf *wiremelt.SessionConfiguration, via string) {
+		var from string
+
+		switch via {
+		case "dnd":
+			from = "Do Not Disturb"
+		case "nnet":
+			from = "Neural Network"
+		default:
+			from = "Session Configuration"
+		}
+
+		format := fmt.Sprintf("+ Initializing Session via '%s'", from)
+		fmt.Println(format, "...")
+		fmt.Println()
+
+		// Check for an existing ClientConfig in .env file
+		if wiremelt.DoesEnvFileExist() {
+			client = wiremelt.LoadClientConfiguration()
+		} else {
+			client = wiremelt.PromptClientConfInit()
+		}
+
+		if client.Parse() {
+			client.Read()
+
+			if via == "config" {
+				// Check for an existing SessionConfig in .env file
+				if wiremelt.DoesSessionConfExist() {
+					session = wiremelt.LoadSessionConfiguration()
+				} else {
+					session = wiremelt.PromptSessionConfInit()
+				}
+			} else {
+				session = sessionConf
+			}
+
+			// ** Check if Node.js is installed, install if not found on system
+
+			session.StartSession(client)
+		}
+	}
+
 	// CLI Initialization
 	app := &cli.App{
 		Name:        "Wiremelt",
@@ -208,33 +251,39 @@ func main() {
 					// WebAssembly
 				//case "pilot":
 				//	pilot.InitPilot()
+				case "dnd":
+					// "DND" (Do Not Disturb) dismisses Neural Network executions for sessions which are NeuralEnabled
+					if wiremelt.DoesEnvFileExist() {
+						sessConf := wiremelt.LoadSessionConfiguration()
+						neuralEnabledDND := utils.YesNoToInt("No")                                                                                                                                                                                                                                               // 1 = No
+						newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledDND, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
+						newConf.UpdateSessionConfiguration()
+
+						fmt.Println("\n~ (dnd) Neural Enabled Session:", "No")
+						StartClient(&newConf, "dnd")
+					} else {
+						log.Fatalln("[x] dnd (Do Not Disturb) requires a session configuration with NeuralEnabled.")
+					}
+				case "nnet":
+					// "NNET" (Neural Network) activates Neural Network executions for sessions which are not NeuralEnabled
+					if wiremelt.DoesEnvFileExist() {
+						sessConf := wiremelt.LoadSessionConfiguration()
+						neuralEnabledNNET := utils.YesNoToInt("Yes")                                                                                                                                                                                                                                              // 0 = Yes
+						newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledNNET, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
+						newConf.UpdateSessionConfiguration()
+
+						fmt.Println("\n~ (nnet) Neural Enabled Session:", "Yes")
+						StartClient(&newConf, "nnet")
+					} else {
+						log.Fatalln("[x] nnet requires a session configuration with NeuralEnabled.")
+					}
 				default:
 					fmt.Printf("Flag: `%v`\n", flag) // .Get(i) obtains element by index from cli.Context.Args()
 				}
 
 				fmt.Println()
 			} else {
-				// Check for an existing ClientConfig in .env file
-				if wiremelt.DoesEnvFileExist() {
-					client = wiremelt.LoadClientConfiguration()
-				} else {
-					client = wiremelt.PromptClientConfInit()
-				}
-
-				if client.Parse() {
-					client.Read()
-
-					// Check for an existing SessionConfig in .env file
-					if wiremelt.DoesSessionConfExist() {
-						session = wiremelt.LoadSessionConfiguration()
-					} else {
-						session = wiremelt.PromptSessionConfInit()
-					}
-
-					// ** Check if Node.js is installed, install if not found on system
-
-					session.StartSession(client)
-				}
+				StartClient(session, "config")
 			}
 
 			return nil
