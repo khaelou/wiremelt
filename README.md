@@ -24,7 +24,7 @@ wiremelt
 ```
 wiremelt client
 ```
-> **Session Configurator** instructs setup details for each session prior to client runtime; sessions handle all workload executions.
+> **Session Configurator** instructs setup details for each session prior to runtime; sessions handle all workload executions.
 ```
 wiremelt session
 ```
@@ -41,7 +41,7 @@ wiremelt macro SayHi https://example.khaelou.com/sayHi.js
 ```
 wiremelt del
 ```
-> **Shell** enables UNIX access, a “*force operator embeds system comamnds for further usability.
+> **Shell** enables UNIX access, a **force* operator embeds system comamnds for further usability.
 ```
 wiremelt shell
 ```
