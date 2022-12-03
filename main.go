@@ -40,7 +40,6 @@ func main() {
 		if wiremelt.DoesEnvFileExist() {
 			format := fmt.Sprintf("\n+ Initializing via '%s'", from)
 			fmt.Println(format, "...")
-			fmt.Println()
 
 			client = wiremelt.LoadClientConfiguration()
 		} else {
@@ -258,7 +257,7 @@ func main() {
 						newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledDND, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
 						newConf.UpdateSessionConfiguration()
 
-						color.HiWhite("\n~ (dnd) Neural Enabled Session:", "No")
+						fmt.Println("\n~ (dnd) Neural Enabled Session:", "No")
 						StartClient(&newConf, "dnd")
 					} else {
 						log.Fatalln("\t[x] dnd (Do Not Disturb) requires a session configuration with NeuralEnabled.")
@@ -270,7 +269,7 @@ func main() {
 						newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledNNET, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
 						newConf.UpdateSessionConfiguration()
 
-						color.HiWhite("\n~ (nnet) Neural Enabled Session:", "Yes")
+						fmt.Println("\n~ (nnet) Neural Enabled Session:", "Yes")
 						StartClient(&newConf, "nnet")
 					} else {
 						log.Fatalln("\t[x] nnet requires a session configuration with NeuralEnabled.")
