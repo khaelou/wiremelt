@@ -11,6 +11,8 @@ import (
 
 	"wiremelt/shell"
 	"wiremelt/worker"
+
+	"github.com/fatih/color"
 )
 
 var sess SessionConfiguration
@@ -18,7 +20,6 @@ var sess SessionConfiguration
 // Initialize Client, populate workspaces for workers to complete jobs
 func InitClient(session *SessionConfiguration) {
 	fmt.Println()
-	fmt.Println("CLIENT INIT")
 
 	// Remove previous input / training data
 	removeCSV := func(filePath string) {
@@ -46,7 +47,6 @@ func constructFactories(ctx context.Context, cancel context.CancelFunc, factorie
 	for fID, targetFactory := range factories { // Loop over each factory from Config, instanciate new factory
 		targetFactory := targetFactory // mandatory
 
-		fmt.Println()
 		log.Println("] FACTORY INITIALIZED:", targetFactory)
 		newFactory := Factory{ID: fID, Focus: targetFactory}
 		SproutedFactories = append(SproutedFactories, newFactory)
@@ -60,7 +60,7 @@ func constructFactories(ctx context.Context, cancel context.CancelFunc, factorie
 
 	func() {
 		defer cancel() // Cancel application context, killing all attached jobs
-		fmt.Println("\nCLEANUP.")
+		color.HiRed("\nCLEANUP.")
 
 		SproutedWorkers = nil
 		SproutedJobs = nil
@@ -129,7 +129,7 @@ func constructFactories(ctx context.Context, cancel context.CancelFunc, factorie
 				}
 			}
 
-			fmt.Println("DONE.")
+			color.HiMagenta("DONE.")
 			WiremeltAscii()
 		}
 	}()

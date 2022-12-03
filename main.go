@@ -14,6 +14,7 @@ import (
 	"wiremelt/wiremelt"
 	"wiremelt/worker"
 
+	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/exp/maps"
@@ -32,15 +33,15 @@ func main() {
 		case "nnet":
 			from = "Neural Network"
 		default:
-			from = "Session Configuration"
+			from = "Configuration"
 		}
-
-		format := fmt.Sprintf("+ Initializing Session via '%s'", from)
-		fmt.Println(format, "...")
-		fmt.Println()
 
 		// Check for an existing ClientConfig in .env file
 		if wiremelt.DoesEnvFileExist() {
+			format := fmt.Sprintf("\n+ Initializing via '%s'", from)
+			fmt.Println(format, "...")
+			fmt.Println()
+
 			client = wiremelt.LoadClientConfiguration()
 		} else {
 			client = wiremelt.PromptClientConfInit()
@@ -83,8 +84,7 @@ func main() {
 				return nil
 			}
 
-			fmt.Println("\n\tWIREMELT")
-			//fmt.Println()
+			color.Yellow("\n\tWIREMELT")
 
 			if context.Args().Len() > 0 {
 				flag := context.Args().Get(0)
@@ -252,33 +252,45 @@ func main() {
 				//case "pilot":
 				//	pilot.InitPilot()
 				case "dnd":
-					// "DND" (Do Not Disturb) dismisses Neural Network executions for sessions which are NeuralEnabled
 					if wiremelt.DoesEnvFileExist() {
 						sessConf := wiremelt.LoadSessionConfiguration()
 						neuralEnabledDND := utils.YesNoToInt("No")                                                                                                                                                                                                                                               // 1 = No
 						newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledDND, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
 						newConf.UpdateSessionConfiguration()
 
-						fmt.Println("\n~ (dnd) Neural Enabled Session:", "No")
+						color.HiWhite("\n~ (dnd) Neural Enabled Session:", "No")
 						StartClient(&newConf, "dnd")
 					} else {
 						log.Fatalln("\t[x] dnd (Do Not Disturb) requires a session configuration with NeuralEnabled.")
 					}
 				case "nnet":
-					// "NNET" (Neural Network) activates Neural Network executions for sessions which are not NeuralEnabled
 					if wiremelt.DoesEnvFileExist() {
 						sessConf := wiremelt.LoadSessionConfiguration()
 						neuralEnabledNNET := utils.YesNoToInt("Yes")                                                                                                                                                                                                                                              // 0 = Yes
 						newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledNNET, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
 						newConf.UpdateSessionConfiguration()
 
-						fmt.Println("\n~ (nnet) Neural Enabled Session:", "Yes")
+						color.HiWhite("\n~ (nnet) Neural Enabled Session:", "Yes")
 						StartClient(&newConf, "nnet")
 					} else {
 						log.Fatalln("\t[x] nnet requires a session configuration with NeuralEnabled.")
 					}
+				case "flush":
+					if wiremelt.DoesEnvFileExist() {
+						flushEnv := os.Remove(".env")
+						if flushEnv != nil {
+							log.Fatal(flushEnv)
+						}
+
+						color.Blue("\n\t[✓] Client reset complete!\n")
+						fmt.Println()
+
+						os.Exit(0)
+					} else {
+						log.Fatalln("\t[x] flush requires a client or session configuration.")
+					}
 				default:
-					fmt.Printf("Flag: `%v`\n", flag) // .Get(i) obtains element by index from cli.Context.Args()
+					fmt.Printf("Flag: `%v`\n", flag)
 				}
 
 				fmt.Println()

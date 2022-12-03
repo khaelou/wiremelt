@@ -3,7 +3,6 @@ package neural
 import (
 	"encoding/csv"
 	"errors"
-	"fmt"
 	"log"
 	"math"
 	"math/rand"
@@ -11,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/fatih/color"
 	"gonum.org/v1/gonum/floats"
 	"gonum.org/v1/gonum/mat"
 )
@@ -69,9 +69,13 @@ func InitNeuralNetwork() float64 {
 	// Calculate the accuracy (subset accuracy).
 	accuracy := float64(truePosNeg) / float64(numPreds)
 
-	// Output the Accuracy value to standard out.
-	if accuracy > 0 {
-		fmt.Printf("\t\t[!] Accuracy = %0.2f\n", accuracy)
+	// Output the Accuracy value
+	if accuracy > 0 && accuracy < 0.75 {
+		color.HiRed("\t\t\t[!*] Accuracy = %0.2f\n", accuracy)
+	} else if accuracy >= 0.75 && accuracy < 1 {
+		color.HiMagenta("\t\t\t[!!] Accuracy = %0.2f\n", accuracy)
+	} else if accuracy >= 1 {
+		color.HiYellow("\t\t\t[!✓] Accuracy = %0.2f\n", accuracy)
 	}
 
 	return accuracy

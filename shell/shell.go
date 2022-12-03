@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"wiremelt/worker"
+
+	"github.com/fatih/color"
 )
 
 func InitShell(spec worker.MacroSpec) {
@@ -21,7 +23,7 @@ func InitShell(spec worker.MacroSpec) {
 			log.Println(err)
 		}
 
-		wireMeltShell := fmt.Sprintf(">_ ] wiremelt@%s\n", hostName)
+		wireMeltShell := color.GreenString(">_ ] wiremelt@%s\n", hostName)
 		fmt.Println(wireMeltShell)
 
 		// Read the keyboad input.

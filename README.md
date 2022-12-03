@@ -69,6 +69,11 @@ wiremelt dnd
 wiremelt nnet
 ```
 
+> **Flush** resets all configurations from Wiremelt, use such flag with caution.
+```
+wiremelt flush
+```
+
 ## Documentation
 
 This project is not yet documented.

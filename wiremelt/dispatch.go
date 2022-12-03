@@ -8,6 +8,8 @@ import (
 	"runtime"
 
 	"wiremelt/worker"
+
+	"github.com/fatih/color"
 )
 
 var SproutedFactories []Factory     // Array to track instanciated factories
@@ -58,7 +60,7 @@ func StartDispatcher(ctx context.Context, targetFactory Factory, workerCount int
 				useV8Isolates = false
 			}
 
-			ctx = context.WithValue(ctx, "neuralEnabled", session.NeuralEnabled) // Pass required data into contextz
+			ctx = context.WithValue(ctx, "neuralEnabled", session.NeuralEnabled) // Pass required data into context
 
 			worker.StartWorker(ctx, useV8Isolates)            // Worker, grabs a waiting job and then does it's task
 			SproutedWorkers = append(SproutedWorkers, worker) // Store Worker for reference
@@ -86,7 +88,9 @@ func StartDispatcher(ctx context.Context, targetFactory Factory, workerCount int
 				}
 			case signal := <-worker.ProductChannel:
 				macroID := fmt.Sprintf("macro.%s", signal.Macro)
-				fmt.Printf("\t[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"\n", signal.WorkerID, macroID, signal.WorkerRole, signal.WorkerFactory, signal.JobID, signal.Product)
+				if session.NeuralEnabled == 0 { // False at 0
+					color.Cyan("\t[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"\n", signal.WorkerID, macroID, signal.WorkerRole, signal.WorkerFactory, signal.JobID, signal.Product)
+				}
 			case job := <-input:
 				worker := <-WorkerChannel // Wait for available worker on channel
 				worker <- job             // Dispatch job to worker waiting on channel

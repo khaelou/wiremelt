@@ -7,7 +7,10 @@ require github.com/urfave/cli/v2 v2.10.3
 require (
 	github.com/atedja/go-vector v0.0.0-20170318030839-a887ff7bead7 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/fatih/color v1.13.0 // indirect
 	github.com/go-rod/stealth v0.4.6 // indirect
+	github.com/mattn/go-colorable v0.1.9 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	golang.org/x/exp v0.0.0-20220713135740-79cabaa25d75 // indirect
 	rogchap.com/v8go v0.7.0 // indirect
 )

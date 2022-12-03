@@ -15,12 +15,13 @@ import (
 	"wiremelt/utils"
 	"wiremelt/worker"
 
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 	"github.com/manifoldco/promptui"
 )
 
 func WiremeltAscii() (interface{}, error) {
-	fmt.Println(`
+	color.HiYellow(`
 	:::       ::: ::::::::::: :::::::::  :::::::::: ::::    ::::  :::::::::: :::    ::::::::::: 
 	:+:       :+:     :+:     :+:    :+: :+:        +:+:+: :+:+:+ :+:        :+:        :+:     
 	+:+       +:+     +:+     +:+    +:+ +:+        +:+ +:+:+ +:+ +:+        +:+        +:+     
@@ -52,8 +53,7 @@ func newClientConfig(connDB helpers.DatabaseConnection, connReCaptcha helpers.Tw
 
 // View contents of ClientConfiguration
 func (config *ClientConfiguration) Read() {
-	fmt.Printf("\n\tClient-Configuration: [DBConn] %v | [2Captcha] %v | [Proxy] %v", config.DBConn, config.ReCaptcha, config.Proxy)
-	fmt.Println("")
+	color.HiMagenta("\n\tClient-Configuration: [DBConn] %v | [2Captcha] %v | [Proxy] %v", config.DBConn, config.ReCaptcha, config.Proxy)
 }
 
 // Parse takes ClientConfiguration as input, validates upon initiating actual client
@@ -101,8 +101,7 @@ func NewSessionConfig(repeatCycle, cpuCores, factoryQuantity, workerQuantity int
 
 // View contents of SessionConfiguration
 func (config *SessionConfiguration) Read() {
-	fmt.Printf("\n\tSession-Configuration: %v", *config)
-	fmt.Println("")
+	color.HiBlue("\n\tSession-Configuration: %v", *config)
 }
 
 // Parse takes SessionConfiguration as input, validates upon initiating into a Session
@@ -488,10 +487,10 @@ func PromptSessionConfInit() *SessionConfiguration {
 
 	strConf := string(conf)                                          // Convert SessionConfiguration JSON object to string
 	baseConf64 := base64.StdEncoding.EncodeToString([]byte(strConf)) // Encode `strConf` to base64
-	envKeyValue := fmt.Sprintf("SESSION_CONFIG=%s\n", baseConf64)    // Convert base64 to string for .env file
+	envKeyValue := fmt.Sprintf("SESSION_CONFIG=%s\n", baseConf64)    // Convert base64 to string
 
 	utils.WriteToEnv("SESSION_CONFIG", envKeyValue)
-	fmt.Println("\n\t[✓] SessionConf saved!")
+	color.HiGreen("\n\t[✓] SessionConf saved!")
 
 	return &newConf
 }
@@ -554,7 +553,7 @@ func (newConfig *ClientConfiguration) UpdateClientConfiguration() {
 	envKeyValue := fmt.Sprintf("CLIENT_CONFIG=%s\n", baseConf64)     // Convert base64 to string for .env file
 
 	utils.WriteToEnv("CLIENT_CONFIG", envKeyValue)
-	fmt.Println("\n\t[✓] ClientConf saved!")
+	color.HiGreen("\n\t[✓] ClientConf saved!")
 }
 
 // Obtain SessionConf from ENV file for usage
@@ -593,5 +592,5 @@ func (newConfig *SessionConfiguration) UpdateSessionConfiguration() {
 	envKeyValue := fmt.Sprintf("SESSION_CONFIG=%s\n", baseConf64)    // Convert base64 to string for .env file
 
 	utils.WriteToEnv("SESSION_CONFIG", envKeyValue)
-	fmt.Println("\n\t[✓] SessionConf updated!")
+	color.HiBlue("\n\t[✓] SessionConf updated!")
 }

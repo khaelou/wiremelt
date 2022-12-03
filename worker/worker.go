@@ -11,6 +11,8 @@ import (
 
 	"wiremelt/macro"
 	"wiremelt/utils"
+
+	"github.com/fatih/color"
 )
 
 type MacroSpec map[string]string
@@ -50,8 +52,16 @@ func checkProductQuality(ctx context.Context, job Job, productSignal macro.Produ
 			log.Println("initNeuron error:", err)
 		}
 
-		qc := fmt.Sprintf("\t\t\t[!✓] #%d NEURON_RESULT: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
-		fmt.Println(qc)
+		var qc string
+		if accuracy > 0 && accuracy < 0.75 {
+			qc = color.RedString("\t\t\t[!✓] #%d NNET_NEURON: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
+		} else {
+			qc = color.HiGreenString("\t\t\t[!✓] #%d NNET_NEURON: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
+		}
+
+		if accuracy > 0 {
+			fmt.Println(qc)
+		}
 	} else {
 		fmt.Println("\t\t\t[xX] QUALITY CHECK: product is nil!")
 	}
@@ -84,7 +94,7 @@ func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
 					if neuralEnabled {
 						checkProductQuality(ctx, job, product)
 					} else {
-						qcBypass := fmt.Sprintf("\t[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
+						qcBypass := color.HiCyanString("\t[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
 						fmt.Println(qcBypass)
 					}
 				} else { // Custom / External Macro
@@ -120,7 +130,7 @@ func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
 						if neuralEnabled {
 							checkProductQuality(ctx, job, product)
 						} else {
-							qcBypass := fmt.Sprintf("\t[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
+							qcBypass := color.HiCyanString("\t[✓][%d] %s .: %s @ %s :: (#%d) PRODUCT = \"%v\"", w.ID, job.Macro, w.Role, w.Factory, job.ID, execMacro)
 							fmt.Println(qcBypass)
 						}
 					}
