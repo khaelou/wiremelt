@@ -19,7 +19,7 @@ wiremelt
 
 ## Flags
 
-> **Client Configurator** instructs setup details for the client prior to session configuration; connects third-party services to client.
+> **Client Configurator** instructs setup details for the client prior to session initialization.
 
 ```
 wiremelt client
