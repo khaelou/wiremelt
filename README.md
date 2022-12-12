@@ -28,6 +28,10 @@ wiremelt client
 ```
 wiremelt session
 ```
+> Passing a value to the *session* flag activates the target session.
+```
+wiremelt session Example
+```
 > **Macro** displays the Macro Library arranged in the session configuation.
 ```
 wiremelt macro
