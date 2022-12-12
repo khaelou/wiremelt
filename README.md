@@ -41,7 +41,7 @@ wiremelt macro
 wiremelt macro SayHi https://example.khaelou.com/sayHi.js
 ```
 
-> **Del** removes the target macro from the Macro Library.
+> **Del** removes the target macro from the Macro Library of the active session.
 ```
 wiremelt del
 ```
