@@ -258,8 +258,6 @@ func main() {
 					shell.InitShell(macroSpec)
 				case "web":
 					// WebAssembly
-				//case "pilot":
-				//	pilot.InitPilot()
 				case "dnd":
 					if wiremelt.DoesEnvFileExist() {
 						sessConf := wiremelt.LoadSessionConfiguration()

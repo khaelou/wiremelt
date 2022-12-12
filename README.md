@@ -32,7 +32,7 @@ wiremelt session
 ```
 wiremelt session Example
 ```
-> **Macro** displays the Macro Library arranged in the session configuation.
+> **Macro** displays the Macro Library arranged in the active session configuation.
 ```
 wiremelt macro
 ```
