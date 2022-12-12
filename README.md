@@ -28,7 +28,7 @@ wiremelt client
 ```
 wiremelt session
 ```
-> Passing a value to the *session* flag activates the target session.
+> Pass a value to the *session* flag to activate the target session if it exists.
 ```
 wiremelt session Example
 ```
