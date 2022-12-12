@@ -671,7 +671,7 @@ func DoesSessionsExist(lookup string, stateLocated bool) ([]string, bool, bool, 
 }
 
 // Commit `SESSIONS` via env file with updated sessionConfigs value
-func UpdateSessions(targetConf SessionConfiguration) {
+func UpdateSessions(targetConf SessionConfiguration, stateLocated bool) {
 	if DoesEnvFileExist() {
 		_, present := os.LookupEnv("SESSIONS")
 		if present {
@@ -683,8 +683,6 @@ func UpdateSessions(targetConf SessionConfiguration) {
 
 			savedSessions := make([]string, 0)
 			json.Unmarshal(rawSess64, &savedSessions) // Convert SessionConfiguration to JSON object
-
-			fmt.Println()
 			//fmt.Printf("~ PREV_UPDATE_SESSIONS_DECODED: %v\n", savedSessions)
 
 			sessionConfigs := savedSessions
@@ -697,7 +695,7 @@ func UpdateSessions(targetConf SessionConfiguration) {
 				}
 				loadConf := &SessionConfiguration{}
 				json.Unmarshal(rawSessionConf64, &loadConf) // Convert SessionConfiguration to JSON object
-				fmt.Printf("- UPDATE_SESSION_DECODED: %s | %v\n", rawSessionConf64, loadConf)
+				//fmt.Printf("- UPDATE_SESSION_DECODED: %s | %v\n", rawSessionConf64, loadConf)
 
 				updateTargetConf, err := json.Marshal(targetConf) // Convert SessionConfiguration to JSON object
 				if err != nil {
@@ -707,11 +705,15 @@ func UpdateSessions(targetConf SessionConfiguration) {
 				baseTarConf64 := base64.StdEncoding.EncodeToString([]byte(strTarConf)) // Encode `strConf` to base64
 
 				if strings.Contains(strings.ToLower(targetConf.SessionName), strings.ToLower(loadConf.SessionName)) {
-					fmt.Println(color.HiMagentaString(fmt.Sprintf("\n\t~ TAR_SAVED_SESSION_CONF :. '%s' located!", loadConf.SessionName)))
+					if stateLocated {
+						fmt.Println(color.HiMagentaString(fmt.Sprintf("\n\t~ TAR_SAVED_SESSION_CONF :. '%s' located!", loadConf.SessionName)))
+					}
 					savedSessions[i] = baseTarConf64
 				} else {
 					if loadConf != nil {
-						fmt.Println(color.HiBlueString("\n\t~ SAVED_SESSION_CONF :. '%s' exists.", loadConf.SessionName))
+						if stateLocated {
+							fmt.Println(color.HiBlueString("\n\t~ SAVED_SESSION_CONF :. '%s' exists.", loadConf.SessionName))
+						}
 					} else {
 						sessionConfigs = append(sessionConfigs, baseTarConf64) // Add saved sessionConf to the updated slice
 						fmt.Println(color.HiMagentaString("\n\t~ SAVED_SESSION_CONF :. Added '%s' to Saved Sessions!", loadConf.SessionName))
@@ -726,7 +728,7 @@ func UpdateSessions(targetConf SessionConfiguration) {
 
 			baseSessConf64 := base64.StdEncoding.EncodeToString([]byte(sessConf)) // Encode `sessConf` to base64
 			sessEnvKeyValue := fmt.Sprintf("SESSIONS=%s", baseSessConf64)         // Convert base64 to string
-			fmt.Printf("~ UPDATE_SESSIONS_ENCODED_SLICE: %s\n", baseSessConf64)
+			//fmt.Printf("~ UPDATE_SESSIONS_ENCODED_SLICE: %s\n", baseSessConf64)
 
 			utils.WriteToEnv("SESSIONS", sessEnvKeyValue)
 		} else {
@@ -802,7 +804,7 @@ func (existingConf *SessionConfiguration) AlterSessionConfiguration() {
 	alteredConf := *NewSessionConfig(existingConf.SessionName, repeatCycle, cpuCores, factoryQtn, workerQtn, jobsPerMacro, factoryFocus, workerRoles, macroSpec, shellCycle, neuralEnabled, trainLimit)
 	alteredConf.UpdateSessionConfiguration()
 
-	UpdateSessions(alteredConf)
+	UpdateSessions(alteredConf, true)
 }
 
 // Commit `SESSION_CONFIG` via env file with updated configuration changes
@@ -820,5 +822,7 @@ func (newConfig *SessionConfiguration) UpdateSessionConfiguration() {
 	if sessions != nil && sessionsFound && sessionFound {
 		utils.WriteToEnv("SESSION_CONFIG", envKeyValue)
 		color.Green("\n\t[✓] Session '%s' is now active!", newConfig.SessionName)
+
+		UpdateSessions(*newConfig, false)
 	}
 }
