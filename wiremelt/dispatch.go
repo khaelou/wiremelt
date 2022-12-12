@@ -43,8 +43,6 @@ func StartDispatcher(ctx context.Context, targetFactory Factory, workerCount int
 		for _, role := range roles {
 			i++
 
-			log.Printf("~ Starting Worker #%d (%s @ %s)\n", i, role, targetFactory.Focus)
-
 			// Add New Worker
 			worker := worker.Worker{
 				ID:            i,
@@ -56,14 +54,18 @@ func StartDispatcher(ctx context.Context, targetFactory Factory, workerCount int
 			}
 
 			useV8Isolates := true
-			if session.RepeatCycle == 1 {
+			if session.RepeatCycle == 1 || session.NeuralEnabled == 1 {
 				useV8Isolates = false
 			}
 
-			ctx = context.WithValue(ctx, "neuralEnabled", session.NeuralEnabled) // Pass required data into context
+			if i == 1 && useV8Isolates {
+				log.Println(color.HiRedString(fmt.Sprintf(">_ V8Isolates? %v", useV8Isolates)))
+			}
 
-			worker.StartWorker(ctx, useV8Isolates)            // Worker, grabs a waiting job and then does it's task
-			SproutedWorkers = append(SproutedWorkers, worker) // Store Worker for reference
+			log.Println(color.HiGreenString("~ Starting Worker #%d (%s @ %s)", i, role, targetFactory.Focus))
+
+			worker.StartWorker(ctx, session.NeuralEnabled, useV8Isolates) // Worker, grabs a waiting job and then does it's task
+			SproutedWorkers = append(SproutedWorkers, worker)             // Store Worker for reference
 		}
 	}
 
@@ -103,8 +105,8 @@ func StartDispatcher(ctx context.Context, targetFactory Factory, workerCount int
 
 // Create Workload of Jobs
 func CreateJobs(amount int, session *SessionConfiguration) []worker.Job {
-	fmt.Println("\n~ Active Threads:", runtime.NumGoroutine())
-	fmt.Println("+ Macros:", session.MacroLibrary)
+	fmt.Println(color.HiMagentaString(fmt.Sprintf("\n~ Active Threads: %v", runtime.NumGoroutine())))
+	fmt.Println(color.HiBlueString(fmt.Sprintf("+ Macros: %v", session.MacroLibrary)))
 	fmt.Println()
 
 	for i := 0; i < amount; i++ {

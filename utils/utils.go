@@ -91,7 +91,7 @@ func YesNoToInt(b string) int {
 	return store
 }
 
-func WriteToEnv(key, keyHasValue string) bool {
+func WriteToEnv(key string, keyHasValue interface{}) bool {
 	envFile, err := ioutil.ReadFile(".env")
 	if err != nil {
 		// Create ENV file
@@ -111,7 +111,7 @@ func WriteToEnv(key, keyHasValue string) bool {
 
 		for i, line := range lines {
 			if strings.Contains(line, key) {
-				lines[i] = keyHasValue // Replace existing value
+				lines[i] = fmt.Sprintf("%s", keyHasValue) // Replace existing value
 			}
 		}
 		output := strings.Join(lines, "\n")
@@ -126,7 +126,7 @@ func WriteToEnv(key, keyHasValue string) bool {
 		}
 		defer f.Close()
 
-		_, writeErr := f.WriteString(keyHasValue)
+		_, writeErr := f.WriteString(fmt.Sprintf("%s", keyHasValue))
 		if writeErr != nil {
 			log.Fatalln(writeErr)
 		}

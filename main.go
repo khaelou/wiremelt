@@ -108,22 +108,32 @@ func main() {
 						loadClientConf.Read()
 					}
 				case "session":
-					promptNewSessionConf := promptui.Select{
-						Label: "New Session Configuration?",
-						Items: []string{"Yes", "No"},
-					}
+					targetSession := context.Args().Get(1)
 
-					_, reply, err := promptNewSessionConf.Run()
-					if err != nil {
-						log.Fatalf("promptNewSessionConf error: %v\n", err)
-					}
+					if targetSession == "" {
+						promptNewSessionConf := promptui.Select{
+							Label: "New Session Configuration?",
+							Items: []string{"Yes", "No"},
+						}
 
-					switch reply {
-					case "Yes":
-						wiremelt.PromptSessionConfInit()
-					case "No":
-						loadSessConf := wiremelt.LoadSessionConfiguration()
-						loadSessConf.Read()
+						_, reply, err := promptNewSessionConf.Run()
+						if err != nil {
+							log.Fatalf("promptNewSessionConf error: %v\n", err)
+						}
+
+						switch reply {
+						case "Yes":
+							wiremelt.PromptSessionConfInit()
+						case "No":
+							loadSessConf := wiremelt.LoadSessionConfiguration()
+							loadSessConf.Read()
+
+							fmt.Println(color.HiCyanString(fmt.Sprintf("\n\t- SESSION_LOCATED '%s' .: The previous configuration will be overwritten!", loadSessConf.SessionName)))
+							loadSessConf.AlterSessionConfiguration()
+						}
+					} else {
+						_, _, _, targetSessionConf := wiremelt.DoesSessionsExist(targetSession, false)
+						targetSessionConf.UpdateSessionConfiguration()
 					}
 				case "macro":
 					importName := context.Args().Get(1)
@@ -172,8 +182,8 @@ func main() {
 
 									if wiremelt.DoesEnvFileExist() {
 										existingSession := wiremelt.LoadSessionConfiguration()
-										maps.Copy(existingSession.MacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                                                                                 // Copy local macroSpecs into saved sessionConf
-										newConf := wiremelt.NewSessionConfig(existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerMacro, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle, existingSession.NeuralEnabled, existingSession.TrainLimit) // Initialize SessionConfiguration with input values
+										maps.Copy(existingSession.MacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                                                                                                              // Copy local macroSpecs into saved sessionConf
+										newConf := wiremelt.NewSessionConfig(existingSession.SessionName, existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerMacro, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle, existingSession.NeuralEnabled, existingSession.TrainLimit) // Initialize SessionConfiguration with input values
 										newConf.UpdateSessionConfiguration()
 									} else {
 										fmt.Println("\n+ TEMP MACRO LIBRARY:", worker.MacroSpecs)
@@ -195,8 +205,8 @@ func main() {
 								worker.MacroSpecs[importName] = importURL
 
 								if wiremelt.DoesEnvFileExist() {
-									maps.Copy(existingMacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                                                                                         // Copy local macroSpecs into saved sessionConf
-									newConf := wiremelt.NewSessionConfig(existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerMacro, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle, existingSession.NeuralEnabled, existingSession.TrainLimit) // Initialize SessionConfiguration with input values
+									maps.Copy(existingMacroLibrary, worker.MacroSpecs)                                                                                                                                                                                                                                                                                                                                                      // Copy local macroSpecs into saved sessionConf
+									newConf := wiremelt.NewSessionConfig(existingSession.SessionName, existingSession.RepeatCycle, existingSession.CPUCores, existingSession.FactoryQuantity, existingSession.WorkerQuantity, existingSession.JobsPerMacro, existingSession.FactoryFocus, existingSession.WorkerRoles, existingSession.MacroLibrary, existingSession.ShellCycle, existingSession.NeuralEnabled, existingSession.TrainLimit) // Initialize SessionConfiguration with input values
 									newConf.UpdateSessionConfiguration()
 								} else {
 									fmt.Println("\n+ TEMP MACRO LIBRARY:", worker.MacroSpecs)
@@ -234,7 +244,7 @@ func main() {
 						if _, ok := macroSpec[parseTarget]; ok {
 							delete(macroSpec, parseTarget)
 
-							newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, macroSpec, sessConf.ShellCycle, sessConf.NeuralEnabled, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
+							newConf := *wiremelt.NewSessionConfig(sessConf.SessionName, sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, macroSpec, sessConf.ShellCycle, sessConf.NeuralEnabled, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
 							newConf.UpdateSessionConfiguration()
 
 							fmt.Println("\n- MACRO LIBRARY:", macroSpec)
@@ -253,8 +263,8 @@ func main() {
 				case "dnd":
 					if wiremelt.DoesEnvFileExist() {
 						sessConf := wiremelt.LoadSessionConfiguration()
-						neuralEnabledDND := utils.YesNoToInt("No")                                                                                                                                                                                                                                               // 1 = No
-						newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledDND, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
+						neuralEnabledDND := utils.YesNoToInt("No")                                                                                                                                                                                                                                                                     // 1 = No
+						newConf := *wiremelt.NewSessionConfig(sessConf.SessionName, sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledDND, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
 						newConf.UpdateSessionConfiguration()
 
 						fmt.Println("\n~ (dnd) Neural Enabled Session:", "No")
@@ -265,8 +275,8 @@ func main() {
 				case "nnet":
 					if wiremelt.DoesEnvFileExist() {
 						sessConf := wiremelt.LoadSessionConfiguration()
-						neuralEnabledNNET := utils.YesNoToInt("Yes")                                                                                                                                                                                                                                              // 0 = Yes
-						newConf := *wiremelt.NewSessionConfig(sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledNNET, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
+						neuralEnabledNNET := utils.YesNoToInt("Yes")                                                                                                                                                                                                                                                                    // 0 = Yes
+						newConf := *wiremelt.NewSessionConfig(sessConf.SessionName, sessConf.RepeatCycle, sessConf.CPUCores, sessConf.FactoryQuantity, sessConf.WorkerQuantity, sessConf.JobsPerMacro, sessConf.FactoryFocus, sessConf.WorkerRoles, sessConf.MacroLibrary, sessConf.ShellCycle, neuralEnabledNNET, sessConf.TrainLimit) // Initialize SessionConfiguration with input values
 						newConf.UpdateSessionConfiguration()
 
 						fmt.Println("\n~ (nnet) Neural Enabled Session:", "Yes")
@@ -279,6 +289,16 @@ func main() {
 						flushEnv := os.Remove(".env")
 						if flushEnv != nil {
 							log.Fatal(flushEnv)
+						}
+
+						flushTest := os.Remove("neural/data/test.csv")
+						if flushEnv != nil {
+							log.Fatal(flushTest)
+						}
+
+						flushTrain := os.Remove("neural/data/train.csv")
+						if flushEnv != nil {
+							log.Fatal(flushTrain)
 						}
 
 						color.Blue("\n\t[✓] Client reset complete!\n")

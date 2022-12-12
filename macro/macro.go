@@ -97,7 +97,7 @@ func (ps *ProductSignal) InitNeuron() (float64, float64, error) {
 	}
 	csvWriter.Flush()
 
-	neuron := color.CyanString("\t\t[✓✓] #%d NEURON_INIT: (macro.%s) Product = \"%v\" (%s @ %s) [Neuron = %f]", ps.JobID, ps.Macro, ps.Product, ps.WorkerRole, ps.WorkerFactory, neuronInbound)
+	neuron := color.CyanString("\t\t[✓✓] #%d NEURON_PRODUCT_SIGNAL: (macro.%s) Product = \"%v\" (%s @ %s) [Neuron = %f]", ps.JobID, ps.Macro, ps.Product, ps.WorkerRole, ps.WorkerFactory, neuronInbound)
 	fmt.Println(neuron)
 
 	var accuracy float64

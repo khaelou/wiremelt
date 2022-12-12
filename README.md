@@ -19,12 +19,12 @@ wiremelt
 
 ## Flags
 
-> **Client Configurator** instructs setup details for the client prior to session configuration; connects required APIs to client.
+> **Client Configurator** instructs setup details for the client prior to session configuration; connects third-party services to client.
 
 ```
 wiremelt client
 ```
-> **Session Configurator** instructs setup details for each session prior to runtime; sessions handle all workload executions.
+> **Session Configurator** instructs setup details for each session prior to workload executions.
 ```
 wiremelt session
 ```
@@ -49,7 +49,6 @@ wiremelt shell
 ```
 >_ ] wiremelt@wm-iMac.local
 
-    [✓][1] HelloWorld .: Surveyor @ Apples :: (#1) PRODUCT = "Hello, world! & Green Apples"
 ls -a *force 
 .               .etc
 ..              .gitignore            LICENSE
@@ -69,7 +68,7 @@ wiremelt dnd
 wiremelt nnet
 ```
 
-> **Flush** resets all configurations from Wiremelt, use such flag with caution.
+> **Flush** resets all configurations and neural network metadata from Wiremelt, use such flag with caution. Custom macro imports will remain installed.
 ```
 wiremelt flush
 ```

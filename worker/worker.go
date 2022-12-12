@@ -55,7 +55,9 @@ func checkProductQuality(ctx context.Context, job Job, productSignal macro.Produ
 		var qc string
 		if accuracy > 0 && accuracy < 0.75 {
 			qc = color.RedString("\t\t\t[!✓] #%d NNET_NEURON: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
-		} else {
+		} else if accuracy >= 0.75 && accuracy < 1 {
+			qc = color.MagentaString("\t\t\t[!✓] #%d NNET_NEURON: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
+		} else if accuracy >= 1 {
 			qc = color.HiGreenString("\t\t\t[!✓] #%d NNET_NEURON: (macro.%s) Accuracy = %f [Neuron \"%v\" - %v]", job.ID, job.Macro, accuracy, productSignal.Product, neuron)
 		}
 
@@ -68,8 +70,8 @@ func checkProductQuality(ctx context.Context, job Job, productSignal macro.Produ
 }
 
 // Start Worker
-func (w *Worker) StartWorker(ctx context.Context, useV8Isolates bool) {
-	neuralEnabled := ctx.Value("neuralEnabled") != 0
+func (w *Worker) StartWorker(ctx context.Context, sessNeuralEnabled int, useV8Isolates bool) {
+	neuralEnabled := sessNeuralEnabled != 0
 
 	go func() {
 		for {

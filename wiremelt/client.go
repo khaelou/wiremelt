@@ -19,8 +19,6 @@ var sess SessionConfiguration
 
 // Initialize Client, populate workspaces for workers to complete jobs
 func InitClient(session *SessionConfiguration) {
-	fmt.Println()
-
 	// Remove previous input / training data
 	removeCSV := func(filePath string) {
 		_, err := os.Stat(filePath)
@@ -47,7 +45,8 @@ func constructFactories(ctx context.Context, cancel context.CancelFunc, factorie
 	for fID, targetFactory := range factories { // Loop over each factory from Config, instanciate new factory
 		targetFactory := targetFactory // mandatory
 
-		log.Println("] FACTORY INITIALIZED:", targetFactory)
+		fmt.Println()
+		log.Println(color.YellowString(fmt.Sprintf("] FACTORY INITIALIZED: %v", targetFactory)))
 		newFactory := Factory{ID: fID, Focus: targetFactory}
 		SproutedFactories = append(SproutedFactories, newFactory)
 
