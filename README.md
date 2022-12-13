@@ -24,19 +24,21 @@ wiremelt
 ```
 wiremelt client
 ```
+
 > **Session Configurator** instructs setup details for each session prior to workload executions.
 ```
 wiremelt session
 ```
-> Pass a value to the *session* flag to activate the target session if it exists.
+Pass a value to the *session* flag to activate the target session if it exists.
 ```
 wiremelt session Example
 ```
+
 > **Macro** displays the Macro Library arranged in the active session configuation.
 ```
 wiremelt macro
 ```
-> The *macro* flag can also be used to import custom macros (external JavaScript).
+The *macro* flag can also be used to import custom macros (external JavaScript).
 ```
 wiremelt macro SayHi https://example.khaelou.com/sayHi.js
 ```
@@ -49,7 +51,7 @@ wiremelt del
 ```
 wiremelt shell
 ```
-> A **force* operator enables UNIX access, which embeds system commands for further usability.
+A **force* operator enables UNIX access, which embeds system commands for further usability.
 ```
 >_ ] wiremelt@wm-iMac.local
 
@@ -60,6 +62,11 @@ ls -a *force
 > **Web** launches Web UI client in default web browser, powered by WebAssembly.
 ```
 wiremelt web
+```
+
+> **Pilot** initiates a navigator for browser automated executions.
+```
+wiremelt pilot
 ```
 
 > **DND** (Do Not Disturb) dismisses Neural Network executions for sessions configured with NeuralEnabled set to true.

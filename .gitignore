@@ -3,6 +3,5 @@ neural/data/test.csv
 neural/data/train.csv
 pilot/
 pilot/extensions/
-screenshots/
-utils/
+pilot/screenshots/
 .env

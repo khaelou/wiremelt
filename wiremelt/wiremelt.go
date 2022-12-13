@@ -331,6 +331,8 @@ var sessionPrompts = func() (int, int, int, int, int, map[int]string, map[int]st
 				fmt.Printf("resultMacroParam Error: %v\n", err)
 			}
 
+			// CHECK: If imported macro is declared w/o script; auto-locate script using camelCaseNaming.js
+
 			worker.MacroSpecs[macro] = strings.TrimSpace(resultMacroParam) // job.paramArg
 		} else {
 			worker.MacroSpecs[macro] = "" // job.paramArg
@@ -670,7 +672,42 @@ func DoesSessionsExist(lookup string, stateLocated bool) ([]string, bool, bool, 
 	}
 }
 
-// Commit `SESSIONS` via env file with updated sessionConfigs value
+// Return JSON of sessions stored
+func GetSessions() []interface{} {
+	if DoesEnvFileExist() {
+		_, present := os.LookupEnv("SESSIONS")
+		if present {
+			sessions := os.Getenv("SESSIONS")                           // Get Sessions value from .env SESSIONS key
+			rawSess64, err := base64.StdEncoding.DecodeString(sessions) // Decode Sessions string
+			if err != nil {
+				log.Fatalln("exist", err)
+			}
+
+			savedSessions := make([]string, 0)
+			json.Unmarshal(rawSess64, &savedSessions) // Convert SavedSessions to JSON object
+
+			decodedSessions := make([]interface{}, 0)
+			for _, session := range savedSessions {
+				rawSessionConf64, err := base64.StdEncoding.DecodeString(session) // Decode SessionConf string
+				if err != nil {
+					log.Fatalln("rawSessionConf64", err)
+				}
+				loadConf := &SessionConfiguration{}
+				json.Unmarshal(rawSessionConf64, &loadConf) // Convert SessionConfiguration to JSON object
+
+				decodedSessions = append(decodedSessions, loadConf)
+			}
+
+			return decodedSessions
+		} else {
+			fmt.Println(color.HiRedString("\n\t~ GET_SESSIONS : Env file misplaced.\n"))
+		}
+	}
+
+	return nil
+}
+
+// Commit `SESSIONS` via env file with updated configuration value
 func UpdateSessions(targetConf SessionConfiguration, stateLocated bool) {
 	if DoesEnvFileExist() {
 		_, present := os.LookupEnv("SESSIONS")
