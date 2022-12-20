@@ -59,7 +59,7 @@ ls -a *force
 .               .etc
 ..              .gitignore            LICENSE
 ```
-> **Web** launches Web UI client in default web browser, powered by WebAssembly.
+> **Web** launches API & Web UI in default web browser, powered by WebAssembly.
 ```
 wiremelt web
 ```

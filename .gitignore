@@ -1,6 +1,7 @@
 custom/
 neural/data/test.csv
 neural/data/train.csv
+pilot/
 pilot/extensions/
 pilot/screenshots/
 .env
