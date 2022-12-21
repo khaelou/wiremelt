@@ -40,7 +40,7 @@ type ClientConfiguration struct {
 	Proxy     helpers.ProxyConnection      `json:"proxy"`
 }
 
-// Initiate New Client confiuration
+// Initiate New Client configuration
 func newClientConfig(connDB helpers.DatabaseConnection, connReCaptcha helpers.TwoCaptchaConnection, proxy helpers.ProxyConnection) *ClientConfiguration {
 	config := &ClientConfiguration{
 		DBConn:    connDB,
@@ -58,10 +58,10 @@ func (config *ClientConfiguration) Read() {
 
 // Parse takes ClientConfiguration as input, validates upon initiating actual client
 func (config *ClientConfiguration) Parse() bool {
-	if config != nil {
-		return true
-	} else {
+	if config == nil {
 		return false
+	} else {
+		return true
 	}
 }
 
@@ -81,7 +81,7 @@ type SessionConfiguration struct {
 	TrainLimit      int              `json:"trainLimit"`
 }
 
-// Initiate New Session confiuration
+// Initiate New Session configuration
 func NewSessionConfig(sessionName string, repeatCycle, cpuCores, factoryQuantity, workerQuantity int, jobsPerMacro int, factoryFocus map[int]string, workerRoles map[int]string, macroSpec worker.MacroSpec, shellCycle int, neuralEnabled int, trainLimit int) *SessionConfiguration {
 	config := SessionConfiguration{
 		SessionName:     sessionName,
@@ -108,10 +108,10 @@ func (config *SessionConfiguration) Read() {
 
 // Parse takes SessionConfiguration as input, validates upon initiating into a Session
 func (config *SessionConfiguration) Parse() bool {
-	if config != nil {
-		return true
-	} else {
+	if config == nil {
 		return false
+	} else {
+		return true
 	}
 }
 
