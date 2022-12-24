@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"wiremelt/macro"
-	"wiremelt/pilot"
+	//"wiremelt/pilot"
 	"wiremelt/shell"
 	"wiremelt/utils"
 	"wiremelt/web"
@@ -261,7 +261,7 @@ func main() {
 				case "web":
 					web.InitHTTPServer(wiremelt.LoadSessionConfiguration()) // API + WebAssembly
 				case "pilot":
-					pilot.InitPilot(wiremelt.LoadSessionConfiguration()) // Rod + Rod-Stealth
+					//pilot.InitPilot(wiremelt.LoadSessionConfiguration()) // Rod + Rod-Stealth
 				case "dnd":
 					if wiremelt.DoesEnvFileExist() {
 						sessConf := wiremelt.LoadSessionConfiguration()
@@ -316,6 +316,7 @@ func main() {
 
 				fmt.Println()
 			} else {
+				//wiremelt.InitUI()
 				StartClient(session, "config")
 			}
 
