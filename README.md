@@ -1,6 +1,6 @@
 # Wiremelt
 
-Extendable utility for parallel concurrent worker-pool operations at scale.
+Extendable AI / ML worker-pool orchestrator.
 
 ## Prerequisites
 * Node.js
